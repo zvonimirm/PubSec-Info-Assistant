@@ -11,7 +11,9 @@ export type ExampleModel = {
 };
 
 const EXAMPLES: ExampleModel[] = [
-    { text: "Odluke Vrhovnog suda u 2024. godini vezane uz radno pravo?", value: "Odluke Vrhovnog suda u 2024. godini vezane uz radno pravo?" }
+    { text: "Primjeri revizija odluka županijskih sudova", value: "Primjeri revizija odluka županijskih sudova" },
+    { text: "Primjeri odluka za određivanje nadležnog suda", value: "Primjeri odluka za određivanje nadležnog suda" }
+    
 ];
 
 interface Props {

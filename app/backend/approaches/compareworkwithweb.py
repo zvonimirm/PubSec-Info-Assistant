@@ -145,7 +145,7 @@ class CompareWorkWithWeb(Approach):
                 stream=True)
 
             yield json.dumps({"data_points": {},
-                            "thoughts": "Searched for:<br>A Comparitive Analysis<br><br>Conversations:<br>" + msg_to_display.replace('\n', '<br>'),
+                            "thoughts": "Traženo:<br>A Comparitive Analysis<br><br>Razgovor:<br>" + msg_to_display.replace('\n', '<br>'),
                             "thought_chain": thought_chain,
                             "work_citation_lookup": work_citation_lookup,
                             "web_citation_lookup": self.web_citations}) + "\n"

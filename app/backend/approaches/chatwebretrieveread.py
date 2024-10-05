@@ -191,7 +191,7 @@ class ChatWebRetrieveRead(Approach):
             
             # Return the data we know
             yield json.dumps({"data_points": {},
-                            "thoughts": f"Searched for:<br>{query_resp}<br><br>Conversations:<br>" + msg_to_display.replace('\n', '<br>'),
+                            "thoughts": f"Traženo:<br>{query_resp}<br><br>Razgovor:<br>" + msg_to_display.replace('\n', '<br>'),
                             "thought_chain": thought_chain,
                             "work_citation_lookup": {},
                             "web_citation_lookup": self.citations}) + "\n"

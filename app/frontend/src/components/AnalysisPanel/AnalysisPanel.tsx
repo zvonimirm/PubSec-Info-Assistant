@@ -162,7 +162,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
         >
             <PivotItem
                 itemKey={AnalysisPanelTabs.ThoughtProcessTab}
-                headerText="Thought process"
+                headerText="Proces razmišljanja"
                 headerButtonProps={isDisabledThoughtProcessTab ? { disabled: true, style: pivotItemDisabledStyle } : undefined}
                 
             >
@@ -171,7 +171,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
             
             <PivotItem
                 itemKey={AnalysisPanelTabs.SupportingContentTab}
-                headerText="Supporting content"
+                headerText="Prateći sadržaj"
                 
                 headerButtonProps={{
                     disabled: isDisabledSupportingContentTab,
@@ -186,12 +186,12 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
             <PivotItem
                 itemKey={AnalysisPanelTabs.CitationTab}
                 
-                headerText="Citation"
+                headerText="Citati"
                 headerButtonProps={{
                     disabled: isDisabledCitationTab,
                     style: isDisabledCitationTab ?  pivotItemDisabledStyle : undefined,
                 }}
-                onRenderItemLink = {onRenderItemLink("No active citation selected. Please select a citation from the citations list on the left.", tooltipRef3, isDisabledCitationTab)}
+                onRenderItemLink = {onRenderItemLink("Nije odabran nijedan citat. Molimo odaberite citat s popisa citata s lijeve strane.", tooltipRef3, isDisabledCitationTab)}
             > 
             
                 <Pivot className={className} selectedKey={innerPivotTab} onLinkClick={(item) => {
@@ -202,25 +202,25 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                         console.warn('Item is undefined');
                     }
                 }}>
-                    <PivotItem itemKey="indexedFile" headerText="Document Section">
+                    <PivotItem itemKey="indexedFile" headerText="Odjeljak dokumenta">
                         {activeCitationObj === undefined ? (
                             <Text>Loading...</Text>
                         ) : 
                         (
                             <div>
-                                <Separator>Metadata</Separator>
-                                <Label>File Name</Label><Text>{activeCitationObj.file_name}</Text>
-                                <Label>File URI</Label><Text>{activeCitationObj.file_uri}</Text>
-                                <Label>Title</Label><Text>{activeCitationObj.title}</Text>
-                                <Label>Section</Label><Text>{activeCitationObj.section}</Text>
-                                <Label>Page Number(s)</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
-                                <Label>Token Count</Label><Text>{activeCitationObj.token_count}</Text>
-                                <Separator>Content</Separator>
-                                <Label>Content</Label><Text>{activeCitationObj.content}</Text>
+                                <Separator>Metapodaci</Separator>
+                                <Label>Ime dokumenta</Label><Text>{activeCitationObj.file_name}</Text>
+                                <Label>Adresa dokumenta</Label><Text>{activeCitationObj.file_uri}</Text>
+                                <Label>Naslov</Label><Text>{activeCitationObj.title}</Text>
+                                <Label>Odjeljak</Label><Text>{activeCitationObj.section}</Text>
+                                <Label>Broj stranica</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
+                                <Label>Broj tokena</Label><Text>{activeCitationObj.token_count}</Text>
+                                <Separator>Sadržaj</Separator>
+                                <Label>Sadržaj</Label><Text>{activeCitationObj.content}</Text>
                             </div>
                         )}
                     </PivotItem>
-                    <PivotItem itemKey="rawFile" headerText="Document">
+                    <PivotItem itemKey="rawFile" headerText="Dokument">
                         {getCitationURL() === '' ? (
                             <Text>Loading...</Text>
                         ) : ["docx", "xlsx", "pptx"].includes(sourceFileExt) ? (

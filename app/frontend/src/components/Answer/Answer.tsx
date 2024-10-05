@@ -71,8 +71,8 @@ export const Answer = ({
                             <IconButton
                                 style={{ color: "black" }}
                                 iconProps={{ iconName: "Lightbulb" }}
-                                title="Show thought process"
-                                ariaLabel="Show thought process"
+                                title="Pokaži proces razmišljanja"
+                                ariaLabel="Pokaži proces razmišljanja"
                                 onClick={() => onThoughtProcessClicked()}
                                 disabled={!answer.thoughts}
                             />
@@ -81,8 +81,8 @@ export const Answer = ({
                             <IconButton
                                 style={{ color: "black" }}
                                 iconProps={{ iconName: "ClipboardList" }}
-                                title="Show supporting content"
-                                ariaLabel="Show supporting content"
+                                title="Pokaži prateći sadržaj"
+                                ariaLabel="Pokaži prateći sadržaj"
                                 onClick={() => onSupportingContentClicked()}
                                 disabled={!answer.data_points || !answer.data_points.length}
                             />
@@ -94,7 +94,7 @@ export const Answer = ({
             <Stack.Item grow>
                 {(answer.approach != Approaches.GPTDirect) &&
                     <div className={styles.protectedBanner}>
-                        <ShieldCheckmark20Regular></ShieldCheckmark20Regular>Your personal and company data are protected
+                        <ShieldCheckmark20Regular></ShieldCheckmark20Regular>Vaši poslovni i privatni podaci su zaštićeni
                     </div>
                 }
                 { answer.answer && <div className={answer.approach == Approaches.GPTDirect ? styles.answerTextUngrounded : styles.answerText}><ReactMarkdown children={parsedAnswer.answerHtml} rehypePlugins={[rehypeRaw, rehypeSanitize]}></ReactMarkdown></div> }
@@ -112,7 +112,7 @@ export const Answer = ({
             {(parsedAnswer.approach == Approaches.ChatWebRetrieveRead && !!parsedAnswer.web_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                        <span className={styles.citationLearnMore}>Citations:</span>
+                        <span className={styles.citationLearnMore}>Citati:</span>
                         {parsedAnswer.web_citations.map((x, i) => {
                             const path = getCitationFilePath(x);
                             return (
@@ -129,7 +129,7 @@ export const Answer = ({
             {(parsedAnswer.approach == Approaches.ReadRetrieveRead && !!parsedAnswer.work_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                        <span className={styles.citationLearnMore}>Citations:</span>
+                        <span className={styles.citationLearnMore}>Citati:</span>
                         {parsedAnswer.work_citations.map((x, i) => {
                             const path = getCitationFilePath(x);
                             return ( 
@@ -146,7 +146,7 @@ export const Answer = ({
                 <div>
                     <Stack.Item>
                         <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                            <span className={styles.citationLearnMore}>Web Citations:</span>
+                            <span className={styles.citationLearnMore}>Web citati:</span>
                             {parsedAnswer.web_citations.map((x, i) => {
                                 const path = getCitationFilePath(x);
                                 return (
@@ -161,7 +161,7 @@ export const Answer = ({
                     <div style={{ width: "100%", margin: "10px 0" }}></div>
                     <Stack.Item>
                         <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                            <span className={styles.citationLearnMore}>Work Citations:</span>
+                            <span className={styles.citationLearnMore}>Citati iz dokumenata:</span>
                             {parsedAnswer.work_citations.map((x, i) => {
                                 const path = getCitationFilePath(x);
                                 return ( 
@@ -179,7 +179,7 @@ export const Answer = ({
                 <div>
                     <Stack.Item>
                         <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                            <span className={styles.citationLearnMore}>Work Citations:</span>
+                            <span className={styles.citationLearnMore}>Citati iz dokumenata:</span>
                             {parsedAnswer.work_citations.map((x, i) => {
                                 const path = getCitationFilePath(x);
                                 return ( 
@@ -193,7 +193,7 @@ export const Answer = ({
                     </Stack.Item>
                     <Stack.Item>
                         <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                            <span className={styles.citationLearnMore}>Web Citations:</span>
+                            <span className={styles.citationLearnMore}>Web citati:</span>
                             {parsedAnswer.web_citations.map((x, i) => {
                                 const path = getCitationFilePath(x);
                                 return (
@@ -223,7 +223,7 @@ export const Answer = ({
                 </Stack.Item>
             )}
             <Stack.Item>
-                <div className={styles.raiwarning}>AI-generated content may be incorrect</div>
+                <div className={styles.raiwarning}>AI-generirani sadržaj može biti netočan</div>
             </Stack.Item>
             {answer.answer && <Stack.Item align="center">
                 <RAIPanel approach={answer.approach} chatMode={chatMode} onAdjustClick={onAdjustClick} onRegenerateClick={onRegenerateClick} onWebSearchClicked={onWebSearchClicked} onWebCompareClicked={onWebCompareClicked} onRagCompareClicked={onRagCompareClicked} onRagSearchClicked={onRagSearchClicked} />

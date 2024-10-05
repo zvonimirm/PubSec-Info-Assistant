@@ -24,7 +24,7 @@ export const AnswerLoading: React.FC<AnswerLoadingProps> = ({ approach }) => {
                 <AnswerIcon approach={approach}/>
                 <Stack.Item grow>
                     <p className={approach == Approaches.GPTDirect ? styles.answerTextUngrounded : styles.answerText}>
-                        Generating answer
+                        Generiram odgovor
                         <span className={styles.loadingdots} />
                     </p>
                 </Stack.Item>

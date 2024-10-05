@@ -145,7 +145,7 @@ const CharacterStreamer = ({ eventSource, nonEventString, onStreamingComplete, c
     }, typingSpeed); // Adjust based on desired "typing" speed
   };
 
-  return isLoading ? <div className={classNames}>Generating Answer{dots}</div> : 
+  return isLoading ? <div className={classNames}>Generiram odgovor{dots}</div> : 
         <div className={classNames}><ReactMarkdown children={output} rehypePlugins={[rehypeRaw, rehypeSanitize]}></ReactMarkdown>
         <div ref={chatMessageStreamEnd} /></div>;
 };

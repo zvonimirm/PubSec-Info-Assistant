@@ -137,7 +137,7 @@ class GPTDirectApproach(Approach):
             msg_to_display = '\n\n'.join([str(message) for message in messages])
                     # Return the data we know
             yield json.dumps({"data_points": {},
-                            "thoughts": f"Searched for:<br>{user_q}<br><br>Conversations:<br>" + msg_to_display.replace('\n', '<br>'),
+                            "thoughts": f"Traženo:<br>{user_q}<br><br>Razgovor:<br>" + msg_to_display.replace('\n', '<br>'),
                             "thought_chain": thought_chain,
                             "work_citation_lookup": {},
                             "web_citation_lookup": {}}) + "\n"

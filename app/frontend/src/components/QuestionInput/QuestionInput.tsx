@@ -77,7 +77,7 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, onAd
                             onMouseLeave={onMouseLeave}
                         >
                             <Broom28Filled primaryFill="rgba(255, 255, 255, 1)" />
-                            <span id={"test"} hidden={clearChatTextEnabled}>Clear Chat</span>
+                            <span id={"test"} hidden={clearChatTextEnabled}>Očisti razgovor</span>
                         </div>
                     </div>
                 )

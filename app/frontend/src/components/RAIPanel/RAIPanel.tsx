@@ -23,17 +23,17 @@ export const RAIPanel = ({approach, chatMode, onAdjustClick, onRegenerateClick, 
         <div className={styles.adjustInputContainer}>
             <div className={styles.adjustInput} onClick={onAdjustClick}>
                 <Options16Filled primaryFill="rgba(133, 133, 133, 1)" />
-                <span className={styles.adjustInputText}>Adjust</span>
+                <span className={styles.adjustInputText}>Prilagodi</span>
             </div>
             <div className={styles.adjustInput} onClick={onRegenerateClick}>
                 <ArrowSync16Filled primaryFill="rgba(133, 133, 133, 1)" />
-                <span className={styles.adjustInputText}>Regenerate</span>
+                <span className={styles.adjustInputText}>Ponovo odgovori</span>
             </div>
             {(approach == Approaches.ChatWebRetrieveRead && chatMode == ChatMode.WorkPlusWeb) &&
                     <>
                         <div className={styles.adjustInput} onClick={onRagSearchClicked}>
                             <BuildingMultipleFilled primaryFill="rgba(133, 133, 133, 1)" />
-                            <span className={styles.adjustInputText}>Search Work</span>
+                            <span className={styles.adjustInputText}>Pretraži dokumente</span>
                         </div>
                         <div className={styles.adjustInput} onClick={onRagCompareClicked}>
                             <BuildingMultipleFilled primaryFill="rgba(133, 133, 133, 1)" />
