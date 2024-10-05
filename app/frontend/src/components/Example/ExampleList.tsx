@@ -11,8 +11,8 @@ export type ExampleModel = {
 };
 
 const EXAMPLES: ExampleModel[] = [
-    { text: "Primjeri revizija odluka županijskih sudova", value: "Primjeri revizija odluka županijskih sudova" },
-    { text: "Primjeri odluka za određivanje nadležnog suda", value: "Primjeri odluka za određivanje nadležnog suda" }
+    { text: "Molio bih primjere revizija odluka županijskih sudova", value: "Molio bih primjere revizija odluka županijskih sudova" },
+    { text: "Molio bih primjere odluka za određivanje nadležnog suda", value: "Molio bih primjere odluka za određivanje nadležnog suda" }
     
 ];
 
