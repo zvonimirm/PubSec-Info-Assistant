@@ -413,13 +413,16 @@ variable "enrichmentAppServicePlanName" {
 variable "enrichmentAppServiceSkuSize" {
   description = "The size of the app service plan for the enrichment service. Must match with the tier value in enrichmentAppServiceSkuTier."
   type = string
-  default = "P2v3"
+#  default = "P2v3"
+  default = "B3" # izmjena ML
 }
 
 variable "enrichmentAppServiceSkuTier" {
   description = "The tier of the app service plan for the enrichment service. Must match with the size value in enrichmentAppServiceSkuSize."
   type = string
-  default = "PremiumV3"
+#  default = "PremiumV3"
+  default = "Basic" # izmjena ML
+
 }
 
 variable "logAnalyticsName" {
@@ -450,13 +453,15 @@ variable "functionsAppName" {
 variable "functionsAppSkuSize" {
   description = "The size of the app service plan for the functions app. Must match with the tier value in functionsAppSkuTier."
   type = string
-  default = "S2"
+#  default = "S2"
+  default  = "B3"  # Promjena ML
 }
 
 variable "functionsAppSkuTier" {
   description = "The tier of the app service plan for the functions app. Must match with the size value in functionsAppSkuSize."
   type = string
-  default = "Standard"
+#  default = "Standard"
+  default  = "Basic"  # Promjena ML
 }
 
 variable "searchServicesName" {
