@@ -1,0 +1,37 @@
+
+.wrap{
+    padding-top: 150px;
+    padding-bottom: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+}
+.legalAssistantEntry{
+    word-break: break-word;
+    background: #dbdbdb;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.legalAssistantEntry:hover {
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+    outline: 2px solid rgba(115, 118, 225, 1);
+} 
+.exampleText {
+    margin: 0;
+    font-size: 21px;
+    width: 320px;
+    height: 90px;
+    text-align: center;
+}
+.image{
+    width: 100px;
+    height: 100px;
+    margin: 0;
+}

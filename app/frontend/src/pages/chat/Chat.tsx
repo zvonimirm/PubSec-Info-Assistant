@@ -27,6 +27,7 @@ import { InfoContent } from "../../components/InfoContent/InfoContent";
 import { FolderPicker } from "../../components/FolderPicker";
 import { TagPickerInline } from "../../components/TagPicker";
 import React from "react";
+import LegalAssistantEntry from "../../components/LegalAssistant/LegalAssistantEntry";
 
 const Chat = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -70,6 +71,8 @@ const Chat = () => {
     const [answers, setAnswers] = useState<[user: string, response: ChatResponse][]>([]);
     const [answerStream, setAnswerStream] = useState<ReadableStream | undefined>(undefined);
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
+
+    const [isLAEntryPointVisible, setLAEntryPointVisible] = useState<boolean>(true);
 
     async function fetchFeatureFlags() {
         try {
@@ -347,8 +350,10 @@ const Chat = () => {
                 </div>
             </div>
             <div className={styles.chatRoot}>
+            
                 <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
+                        <div>
                         <div className={styles.chatEmptyState}>
                             {activeChatMode == ChatMode.WorkOnly ? 
                                 <div>
@@ -382,6 +387,11 @@ const Chat = () => {
                                 </div>
                             }
                         </div>
+                        <div>
+                           <LegalAssistantEntry />
+                        </div>
+                        </div>
+
                     ) : (
                         <div className={styles.chatMessageStream}>
                             {answers.map((answer, index) => (
@@ -449,7 +459,7 @@ const Chat = () => {
                         />
                     </div>
                 </div>
-
+                
                 {answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel
                         className={styles.chatAnalysisPanel}
