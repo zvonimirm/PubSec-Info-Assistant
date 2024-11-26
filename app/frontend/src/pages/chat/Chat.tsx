@@ -348,6 +348,9 @@ const Chat = () => {
     }
 
     const handleGetSummary = () => {
+        clearChat();
+        setAssistentPointVisible(true);
+        console.log("Get Summary");
         makeApiRequest(`${getDummyText()}. Mogu li dobiti sažetak ovog dokumenta?`, Approaches.GPTDirect, {}, {}, {});  
     };
     const getDummyText   = () => {return `Broj: Revd 999/9999-9
@@ -373,6 +376,7 @@ const Chat = () => {
         Zagreb, 25. siječnja 2024.
         Zrinka Gligo
     `}
+
     return (
         <div className={styles.container}>
             <div className={styles.subHeader}>
