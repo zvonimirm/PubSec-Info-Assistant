@@ -9,10 +9,20 @@ interface Props {
     tags: string[];
   }
 
-    const LegalAssistant = ({folderPath, tags}: Props) => {
+interface Props {
+    folderPath: string;
+    tags: string[];
+    onEvent: (message: string) => void;
+}
+
+const LegalAssistant = ({folderPath, tags, onEvent}: Props) => {
     const [files, setFiles] = useState<any>([]);
         
     const handleOnChange = () => {}
+    const handleSummaryClick = () => {
+        console.log("Button clicked from X");
+        onEvent("Button clicked from legal assistant");
+    };
     return (
         <>
             <div className={styles.mainDiv}>
@@ -21,7 +31,7 @@ interface Props {
                     <DropZone onChange={handleOnChange} accept={files}/>
                 </div>      
                 <div className={styles.actionsStyles}>
-                     <span className={styles.btnStyle}>
+                     <span className={styles.btnStyle} onClick={handleSummaryClick}>
                         <p className={styles.exampleText}>
                             Generiranje sažetka dokumenata
                         </p>
