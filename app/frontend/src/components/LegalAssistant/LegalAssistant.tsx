@@ -20,7 +20,6 @@ const LegalAssistant = ({folderPath, tags, onEvent}: Props) => {
         
     const handleOnChange = () => {}
     const handleSummaryClick = () => {
-        console.log("Button clicked from X");
         onEvent("Button clicked from legal assistant");
     };
     return (
