@@ -27,6 +27,10 @@ import { InfoContent } from "../../components/InfoContent/InfoContent";
 import { FolderPicker } from "../../components/FolderPicker";
 import { TagPickerInline } from "../../components/TagPicker";
 import React from "react";
+import { LegalAssistantEntry } from "../../components/LegalAssistant/LegalAssistantEntry";
+import {LegalAssistant} from "../../components/LegalAssistant/LegalAssistant";
+
+
 
 const Chat = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -71,6 +75,8 @@ const Chat = () => {
     const [answerStream, setAnswerStream] = useState<ReadableStream | undefined>(undefined);
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
+    const [isLAEntryPointVisible, setAssistentPointVisible] = useState(true);
+
     async function fetchFeatureFlags() {
         try {
             const fetchedFeatureFlags = await getFeatureFlags();
@@ -80,6 +86,11 @@ const Chat = () => {
             console.log(error);
         }
     }
+
+    const handleLegalAssistantClick = () => {
+        setAssistentPointVisible(false);
+    }
+
 
     const makeApiRequest = async (question: string, approach: Approaches, 
                                 work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
@@ -347,8 +358,10 @@ const Chat = () => {
                 </div>
             </div>
             <div className={styles.chatRoot}>
-                <div className={styles.chatContainer}>
+            
+            {isLAEntryPointVisible && <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
+                        <div>
                         <div className={styles.chatEmptyState}>
                             {activeChatMode == ChatMode.WorkOnly ? 
                                 <div>
@@ -382,6 +395,11 @@ const Chat = () => {
                                 </div>
                             }
                         </div>
+                        <div>
+                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantClick}/>
+                        </div>
+                        </div>
+
                     ) : (
                         <div className={styles.chatMessageStream}>
                             {answers.map((answer, index) => (
@@ -449,7 +467,11 @@ const Chat = () => {
                         />
                     </div>
                 </div>
-
+            }
+            {
+                !isLAEntryPointVisible &&
+                    <LegalAssistant folderPath={""} tags={[]} />
+            }
                 {answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel
                         className={styles.chatAnalysisPanel}
