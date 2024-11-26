@@ -348,7 +348,7 @@ const Chat = () => {
     }
 
     const handleGetSummary = () => {
-        console.log(getDummyText());   
+        makeApiRequest(`${getDummyText()}. Mogu li dobiti sažetak ovog dokumenta?`, Approaches.GPTDirect, {}, {}, {});  
     };
     const getDummyText   = () => {return `Broj: Revd 999/9999-9
         U  I M E  R E P U B L I K E  H R V A T S K E
