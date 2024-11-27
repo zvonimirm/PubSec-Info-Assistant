@@ -347,10 +347,10 @@ const Chat = () => {
         setAnswers(newItems);
     }
 
-    const handleGetSummary = () => {
+    const handleGetSummary = (text: string) => {
         clearChat();
         setAssistentPointVisible(true);
-        console.log("Get Summary");
+        console.log(text);
         makeApiRequest(`${getDummyText()}. Mogu li dobiti sažetak ovog dokumenta?`, Approaches.GPTDirect, {}, {}, {});  
     };
     const getDummyText   = () => {return `Broj: Revd 999/9999-9
@@ -500,7 +500,7 @@ const Chat = () => {
             }
             {
                 !isLAEntryPointVisible &&
-                    <LegalAssistant onEvent = {handleGetSummary} folderPath={""} tags={[]} />
+                    <LegalAssistant onEvent = {handleGetSummary} />
             }
                 {answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel
