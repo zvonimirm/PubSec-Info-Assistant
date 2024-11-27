@@ -32,7 +32,7 @@ const FilePicker = ({ folderPath, tags, isBtnUploadFilesVisible, onFilesChange }
     setFiles(filesArray as any);  
     setProgress(0);  
     setUploadStarted(false);  
-    onFilesChange();
+    onFilesChange(filesArray);
   }, []);  
   
   // handle for removing files form the files list view  

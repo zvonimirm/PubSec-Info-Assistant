@@ -75,7 +75,7 @@ const Chat = () => {
     const [answerStream, setAnswerStream] = useState<ReadableStream | undefined>(undefined);
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
-    const [isLAEntryPointVisible, setAssistentPointVisible] = useState(true);
+    const [isLAEntryPointVisible, setAssistentEntryPointVisible] = useState(true);
 
     async function fetchFeatureFlags() {
         try {
@@ -87,8 +87,8 @@ const Chat = () => {
         }
     }
 
-    const handleLegalAssistantClick = () => {
-        setAssistentPointVisible(false);
+    const handleLegalAssistantEntryClick = () => {
+        setAssistentEntryPointVisible(false);
     }
 
 
@@ -347,10 +347,34 @@ const Chat = () => {
         setAnswers(newItems);
     }
 
-    const handleGetSummary = (text: string) => {
+    const handleSummaryClick = (text: string, files: any) => {
+        console.log("Handling case one with text:", text);
+        // Add your logic for case one here
+    };
+
+    const handleBlobStorage = (text: string, files: any) => {
+        console.log("Handling case two with text:", text);
+        // Add your logic for case two here
+    };
+
+    const handleDecisionProposal = (text: string, files: any) => {
+        console.log("Handling case three with text:", text);
+        // Add your logic for case three here
+    };
+
+
+    const handleLegalAssistantAction = (text: string, files: any) => {
         clearChat();
-        setAssistentPointVisible(true);
-        console.log(text);
+        setAssistentEntryPointVisible(true);
+
+        if (text.includes("Summary")) {
+            handleSummaryClick(text, files);
+        } else if (text.includes("BlobStorage")) {
+            handleBlobStorage(text, files);
+        } else if (text.includes("Decision")) {
+            handleDecisionProposal(text, files);
+        }
+        
         makeApiRequest(`${getDummyText()}. Mogu li dobiti sažetak ovog dokumenta?`, Approaches.GPTDirect, {}, {}, {});  
     };
     const getDummyText   = () => {return `Broj: Revd 999/9999-9
@@ -426,7 +450,7 @@ const Chat = () => {
                             }
                         </div>
                         <div>
-                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantClick}/>
+                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantEntryClick}/>
                         </div>
                         </div>
 
@@ -500,7 +524,7 @@ const Chat = () => {
             }
             {
                 !isLAEntryPointVisible &&
-                    <LegalAssistant onEvent = {handleGetSummary} />
+                    <LegalAssistant onEvent = {handleLegalAssistantAction} />
             }
                 {answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel
