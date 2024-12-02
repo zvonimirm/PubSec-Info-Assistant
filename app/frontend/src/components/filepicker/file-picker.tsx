@@ -14,7 +14,7 @@ interface Props {
   folderPath: string;  
   tags: string[];  
   isBtnUploadFilesVisible: boolean;
-  onFilesChange: () => void;
+  onFilesChange: (files: any) => void;
 }  
   
 const FilePicker = ({ folderPath, tags, isBtnUploadFilesVisible, onFilesChange }: Props) => {  
@@ -32,7 +32,7 @@ const FilePicker = ({ folderPath, tags, isBtnUploadFilesVisible, onFilesChange }
     setFiles(filesArray as any);  
     setProgress(0);  
     setUploadStarted(false);  
-    onFilesChange();
+    onFilesChange(filesArray);
   }, []);  
   
   // handle for removing files form the files list view  

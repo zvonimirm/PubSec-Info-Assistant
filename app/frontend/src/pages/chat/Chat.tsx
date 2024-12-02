@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator, Toggle, Label } from "@fluentui/react";
 import Switch from 'react-switch';
 import { GlobeFilled, BuildingMultipleFilled, AddFilled, ChatSparkleFilled } from "@fluentui/react-icons";
@@ -29,6 +29,7 @@ import { TagPickerInline } from "../../components/TagPicker";
 import React from "react";
 import { LegalAssistantEntry } from "../../components/LegalAssistant/LegalAssistantEntry";
 import {LegalAssistant} from "../../components/LegalAssistant/LegalAssistant";
+import mammoth from 'mammoth';
 
 
 
@@ -75,7 +76,8 @@ const Chat = () => {
     const [answerStream, setAnswerStream] = useState<ReadableStream | undefined>(undefined);
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
-    const [isLAEntryPointVisible, setAssistentPointVisible] = useState(true);
+    const [isLAEntryPointVisible, setAssistentEntryPointVisible] = useState(true);
+    const [fileText, setFileText] = useState<string[]>([]);
 
     async function fetchFeatureFlags() {
         try {
@@ -87,8 +89,8 @@ const Chat = () => {
         }
     }
 
-    const handleLegalAssistantClick = () => {
-        setAssistentPointVisible(false);
+    const handleLegalAssistantEntryClick = () => {
+        setAssistentEntryPointVisible(false);
     }
 
 
@@ -347,10 +349,101 @@ const Chat = () => {
         setAnswers(newItems);
     }
 
-    const handleGetSummary = (text: string) => {
+    const handleSummaryClick = async (text: string, files: any) => {
+        console.log("Handling case one with text:", files);
+        readTextFromFile(files);
+    };
+
+    const handleBlobStorage = (text: string, files: any) => {
+        console.log("Handling case two with text:", text);
+        handleUpload(files);
+    };
+
+    const handleDecisionProposal = (text: string, files: any) => {
+        console.log("Handling case three with text:", text);
+        // Add your logic for case three here
+    };
+    const handleUpload = async (files: any)  => {  
+
+        console.log("Handling case two with text:"); 
+        try {  
+          const data = new FormData();  
+          console.log("files", files);  
+        // //   setUploadStarted(true);  
+        //   let uploadedFilesCount = 0;
+      
+        //   const uploadPromises = files.map(async (indexedFile:any, index:any) => {  
+        //     const file = indexedFile.file as File;  
+        //     // const filePath = folderPath === "" ? file.name : `${folderPath}/${file.name}`;  
+            const filePath = files[0].name;  
+      
+        //     // Append file and other data to FormData  
+            data.append("file", files[0]);  
+            data.append("file_path", filePath);  
+            
+        //     if (tags.length > 0) {
+        //       data.append("tags", tags.map(encodeURIComponent).join(",")); 
+        //     }
+      
+            try {  
+              const response = await fetch("/file", {  
+                method: "POST",  
+                body: data,  
+              });  
+      
+              if (!response.ok) {  
+                throw new Error(`Failed to upload file: ${filePath}`);  
+              }  
+      
+              const result = await response.json();  
+              console.log(result);  
+      
+        //       // Write status to log  
+        //       const logEntry: StatusLogEntry = {  
+        //         path: "upload/" + filePath,  
+        //         status: "File uploaded from browser to backend API",  
+        //         status_classification: StatusLogClassification.Info,  
+        //         state: StatusLogState.Uploaded,  
+        //       };  
+        //       await logStatus(logEntry);
+              
+            } catch (error) {  
+              console.log("Unable to upload file " + filePath + " : Error: " + error);  
+            }  
+        //     // Increment the counter for successfully uploaded files
+        //     uploadedFilesCount++;
+        //     setProgress((uploadedFilesCount / files.length) * 100);
+          
+        //   });
+      
+        //   await Promise.all(uploadPromises);  
+        //   setUploadStarted(false);  
+        } catch (error) {  
+          console.log(error);  
+        }  
+        //   , [files, folderPath, tags]);
+    };
+
+    const readTextFromFile = async (files: any) => {
+        console.log("Reading file - start");
+        const reader = new FileReader();
+        console.log("Reading file - middle");
+        reader.readAsText(files[0]);
+        console.log("Reading file", reader.result);
+    };
+
+    const handleLegalAssistantAction = (text: string, files: any) => {
         clearChat();
-        setAssistentPointVisible(true);
-        console.log(text);
+        setAssistentEntryPointVisible(true);
+
+        if (text.includes("Summary")) {
+            handleSummaryClick(text, files);
+        } else if (text.includes("BlobStorage")) {
+            handleBlobStorage(text, files);
+        } else if (text.includes("Decision")) {
+            handleDecisionProposal(text, files);
+        }
+        
         makeApiRequest(`${getDummyText()}. Mogu li dobiti sažetak ovog dokumenta?`, Approaches.GPTDirect, {}, {}, {});  
     };
     const getDummyText   = () => {return `Broj: Revd 999/9999-9
@@ -426,7 +519,7 @@ const Chat = () => {
                             }
                         </div>
                         <div>
-                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantClick}/>
+                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantEntryClick}/>
                         </div>
                         </div>
 
@@ -500,7 +593,7 @@ const Chat = () => {
             }
             {
                 !isLAEntryPointVisible &&
-                    <LegalAssistant onEvent = {handleGetSummary} />
+                    <LegalAssistant onEvent = {handleLegalAssistantAction} />
             }
                 {answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel

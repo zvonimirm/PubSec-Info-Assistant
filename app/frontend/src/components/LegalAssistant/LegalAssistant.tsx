@@ -7,7 +7,7 @@ import styles from './LegalAssistant.module.css';
 
 
 interface Props {
-    onEvent: (event: string) => void;
+    onEvent: (event: string, files: any)  => void;
   }
 
 
@@ -16,41 +16,25 @@ const LegalAssistant = ({onEvent}: Props) => {
     const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined);
     const [selectedTags, setSelectedTags] = useState<string[] | undefined>(undefined);
     const [isClickable, setIsClickable] = useState(false);
-    // const onSelectedKeyChanged = (selectedFolder: string[]) => {
-    //     setSelectedKey(selectedFolder[0]);
-    // };
+    const [files, setFiles] = useState<any>([]);
 
-
-    const handleFilesChange = () => {
-        console.log("Files changed");
+    const handleFilesChange = (files: any) => {
+        setFiles(files);
         setIsClickable(true);
     }
-        
-    // const handleOnFilesChange = useCallback((files: any) => {  
-    //     let filesArray = Array.from(files);  
-    //     filesArray = filesArray.map((file) => ({  
-    //       id: nanoid(),  
-    //       file,  
-    //     }));  
-    //     setFiles(filesArray as any);  
-    //     setProgress(0);  
-    //     setUploadStarted(false);  
-    //   }, []);  
-  
-      
-
+    
     const handleSummaryClick = () => {
-        onEvent("Summary");
+        onEvent("Summary", files);
     };
 
     const handleBlobStorage = () => {
-        onEvent("BlobStorage");
+        onEvent("BlobStorage", files);
     };
 
     const handleDecisionProposal = () => {
-        onEvent("Decision");
+        onEvent("Decision", files);
     };
-
+    
     return (
         <>
             <div className={styles.mainDiv}>
