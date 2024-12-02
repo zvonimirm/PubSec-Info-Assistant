@@ -14,7 +14,7 @@ interface Props {
   folderPath: string;  
   tags: string[];  
   isBtnUploadFilesVisible: boolean;
-  onFilesChange: () => void;
+  onFilesChange: (files: any) => void;
 }  
   
 const FilePicker = ({ folderPath, tags, isBtnUploadFilesVisible, onFilesChange }: Props) => {  

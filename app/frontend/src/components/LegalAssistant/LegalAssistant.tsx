@@ -17,29 +17,12 @@ const LegalAssistant = ({onEvent}: Props) => {
     const [selectedTags, setSelectedTags] = useState<string[] | undefined>(undefined);
     const [isClickable, setIsClickable] = useState(false);
     const [files, setFiles] = useState<any>([]);
-    // const onSelectedKeyChanged = (selectedFolder: string[]) => {
-    //     setSelectedKey(selectedFolder[0]);
-    // };
-
 
     const handleFilesChange = (files: any) => {
         setFiles(files);
         setIsClickable(true);
     }
-        
-    // const handleOnFilesChange = useCallback((files: any) => {  
-    //     let filesArray = Array.from(files);  
-    //     filesArray = filesArray.map((file) => ({  
-    //       id: nanoid(),  
-    //       file,  
-    //     }));  
-    //     setFiles(filesArray as any);  
-    //     setProgress(0);  
-    //     setUploadStarted(false);  
-    //   }, []);  
-  
-      
-
+    
     const handleSummaryClick = () => {
         onEvent("Summary", files);
     };
@@ -51,7 +34,7 @@ const LegalAssistant = ({onEvent}: Props) => {
     const handleDecisionProposal = () => {
         onEvent("Decision", files);
     };
-
+    
     return (
         <>
             <div className={styles.mainDiv}>

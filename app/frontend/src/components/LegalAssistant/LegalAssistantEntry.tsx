@@ -9,7 +9,7 @@ export const LegalAssistantEntry = ({onLegalAssistantEntryClicked} : LegalAssist
             <>
                 <div className={styles.wrap}> 
                     <img src={legalAssistantIcon} alt="Description of image" className={styles.image} />
-                    <h1> Napredni pomoćnik - TEST make deploy</h1>
+                    <h1> Napredni pomoćnik</h1>
                     <div className={styles.legalAssistantEntry} 
                         onClick={()=>onLegalAssistantEntryClicked('TEST')}>
                         <p className={styles.exampleText}>
