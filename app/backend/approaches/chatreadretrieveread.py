@@ -216,6 +216,7 @@ class ChatReadRetrieveReadApproach(Approach):
         
         # Generate embedding using REST API
         url = f'{self.embedding_service_url}/models/{self.escaped_target_model}/embed'
+        log.info(f"Generating embedding for url: {self.embedding_service_url}")    
         data = [f'"{generated_query}"']
         
         headers = {
@@ -225,6 +226,7 @@ class ChatReadRetrieveReadApproach(Approach):
 
         embedded_query_vector = None
         try:
+            log.info(f"Generating embedding for url: {url}")
             response = requests.post(url, json=data,headers=headers,timeout=60)
             if response.status_code == 200:
                 response_data = response.json()
