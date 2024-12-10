@@ -97,19 +97,22 @@ const Chat = () => {
     const makeApiRequest = async (question: string, approach: Approaches, 
                                 work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
-                                thought_chain: { [key: string]: string}) => {
+                                thought_chain: { [key: string]: string },
+                                display_question?: string) => {
         lastQuestionRef.current = question;
         lastQuestionWorkCitationRef.current = work_citation_lookup;
         lastQuestionWebCitiationRef.current = web_citation_lookup;
         lastQuestionThoughtChainRef.current = thought_chain;
         setActiveApproach(approach);
-
+        setDefaultApproach(approach);
+        
         error && setError(undefined);
         setIsLoading(true);
         setActiveCitation(undefined);
         setActiveAnalysisPanelTab(undefined);
 
         try {
+            const display_question_text = display_question || question;
             const history: ChatTurn[] = answers.map(a => ({ user: a[0], bot: a[1].answer }));
             const request: ChatRequest = {
                 history: [...history, { user: question, bot: undefined }],
@@ -146,7 +149,7 @@ const Chat = () => {
                 web_citation_lookup: {}
             };
 
-            setAnswers([...answers, [question, temp]]);
+            setAnswers([...answers, [display_question_text, temp]]);
             const controller = new AbortController();
             setAbortController(controller);
             const signal = controller.signal;
@@ -473,8 +476,10 @@ const Chat = () => {
             console.log("Unsupported file type", files[0].file.name);
         }
     
+        let diplay_question = `Generiram sažetak dokumenta: ${files[0].file.name}`;
         setFileContent(content);
-        makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.GPTDirect, {}, {}, {});
+        setActiveApproach(Approaches.DocumentSummary);
+        makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.GPTDirect, {}, {}, {}, diplay_question);
     };
 
     const handleBlobStorage = async (text: string, files: any) => {
