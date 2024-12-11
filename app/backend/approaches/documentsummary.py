@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 import json
 import re
 import logging
@@ -24,19 +21,31 @@ from text import nonewlines
 from core.modelhelper import get_token_limit
 import requests
 
-class ChatReadRetrieveReadApproach(Approach):
+
+class DocumentSummary(Approach):
     """Approach that uses a simple retrieve-then-read implementation, using the Azure AI Search and
-    Azure OpenAI APIs directly. It first retrieves top documents from search,
+    Azure OpenAI APIs directly. It first retrieves top documents from search, combines it with data from request,
     then constructs a prompt with them, and then uses Azure OpenAI to generate
     an completion (answer) with that prompt."""
-     
 
 
-    SYSTEM_MESSAGE_CHAT_CONVERSATION = """You are an Azure OpenAI Completion system. Your persona is {systemPersona} who helps answer questions about an agency's data. {response_length_prompt}
-    User persona is {userPersona} Answer ONLY with the facts listed in the list of sources below in {query_term_language} with citations.If there isn't enough information below, say you don't know and do not give citations. For tabular information return it as an html table. Do not return markdown format.
-    Your goal is to provide answers based on the facts listed below in the provided source documents. Avoid making assumptions,generating speculative or generalized information or adding personal opinions.
+    SYSTEM_MESSAGE_CHAT_CONVERSATION = """You are an Azure OpenAI Completion system. Your persona is {systemPersona} who helps with 
+    generating new similar documents based on the information provided in the inputText or in source documents. User persona is {userPersona}.
+    
+    This is inputText: "{response_length_prompt}".
+    
+    First, extract key information from the inputText. Subsequently, search for similar documents within the document database. 
+    Please provide citations for all referenced documents.
+    If the answer can only be found in the information provided in inputText, do not provide citations.
+
+    Finally, generate a new document based on the gathered information. The new document should follow the same format as the existing documents in the database, 
+    with a header, rationale, and a similar overall layout.
+    Avoid making assumptions, generating speculative or generalized information or adding personal opinions.
+    
+    
    
-    Each source has content followed by a pipe character and the URL. Instead of writing the full URL, cite it using placeholders like [File1], [File2], etc., based on their order in the list. Do not combine sources; list each source URL separately, e.g., [File1] [File2].
+    Each source has content followed by a pipe character and the URL. Instead of writing the full URL, cite it using placeholders like [File1], [File2], etc., based on their order in the list. Do not combine sources; 
+    list each source URL separately, e.g., [File1] [File2].
     Never cite the source content using the examples provided in this paragraph that start with info.
     Sources:
     - Content about topic A | info.pdf
@@ -46,11 +55,11 @@ class ChatReadRetrieveReadApproach(Approach):
 
     Here is how you should answer every question:
     
-    -Look for information in the source documents to answer the question in {query_term_language}.
-    -If the source document has an answer, please respond with citation.You must include a citation to each document referenced only once when you find answer in source documents.      
-    -If you cannot find answer in below sources, respond with I am not sure.Do not provide personal opinions or assumptions and do not include citations.
-    -Identify the language of the user's question and translate the final response to that language.if the final answer is " I am not sure" then also translate it to the language of the user's question and then display translated response only. nothing else.
-
+    -Start by extracting key information from the source documents and the query.
+    -Look for information in the source documents and in information from query to answer the question in {query_term_language}.
+    -Generate a new document based on the gathered information.
+    -At the end of answer, provide citations for all referenced documents.
+    
     {follow_up_questions_prompt}
     {injected_prompt}
     """
@@ -74,11 +83,10 @@ class ChatReadRetrieveReadApproach(Approach):
     ]
 
     RESPONSE_PROMPT_FEW_SHOTS = [
-        {"role": Approach.USER ,'content': 'I am looking for information in source documents'},
-        {'role': Approach.ASSISTANT, 'content': 'user is looking for information in source documents. Do not provide answers that are not in the source documents'}
+        {"role": Approach.USER ,'content': 'I am looking for information in source documents and in information from query.'},
+        {'role': Approach.ASSISTANT, 'content': 'user is looking for information in source documents and in information from query. Do not provide answers that are not in the source documents or query information.'}
     ]
-    
-    
+
     def __init__(
         self,
         search_client: SearchClient,
@@ -134,10 +142,6 @@ class ChatReadRetrieveReadApproach(Approach):
         self.model_name = model_name
         self.model_version = model_version
         
-       
-      
-        
-    # def run(self, history: list[dict], overrides: dict) -> any:
     async def run(self, history: Sequence[dict[str, str]], overrides: dict[str, Any], citation_lookup: dict[str, Any], thought_chain: dict[str, Any]) -> Any:
 
         log = logging.getLogger("uvicorn")
@@ -424,7 +428,6 @@ class ChatReadRetrieveReadApproach(Approach):
             yield json.dumps({"error": f"Error generating chat completion: {str(e)}"}) + "\n"
             return
 
-
     def detect_language(self, text: str) -> str:
         """ Function to detect the language of the text"""
         try:
@@ -456,7 +459,7 @@ class ChatReadRetrieveReadApproach(Approach):
                 raise Exception(f"Error detecting language: {response.status_code} - {response.text}")
         except Exception as e:
             raise Exception(f"An error occurred during language detection: {str(e)}") from e
-     
+    
     def translate_response(self, response: str, target_language: str) -> str:
         """ Function to translate the response to target language"""
         api_translate_endpoint = f"{self.azure_ai_endpoint}translator/text/v3.0/translate?api-version=3.0"

@@ -87,7 +87,7 @@ const Content = () => {
                         <div className={styles.EmptyObjectivesListItem}>
                             <FolderPicker allowFolderCreation={true} onSelectedKeyChange={onSelectedKeyChanged}/>
                             <TagPickerInline allowNewTags={true} onSelectedTagsChange={onSelectedTagsChanged}/>
-                            <FilePicker folderPath={selectedKey || ""} tags={selectedTags || []}/>
+                            <FilePicker folderPath={selectedKey || ""} tags={selectedTags || []} isBtnUploadFilesVisible={true} onFilesChange={  () => {}}/>
                         </div>
                     </div>
                 </PivotItem>

@@ -13,9 +13,11 @@ import { logStatus, StatusLogClassification, StatusLogEntry, StatusLogState } fr
 interface Props {  
   folderPath: string;  
   tags: string[];  
+  isBtnUploadFilesVisible: boolean;
+  onFilesChange: (files: any) => void;
 }  
   
-const FilePicker = ({ folderPath, tags }: Props) => {  
+const FilePicker = ({ folderPath, tags, isBtnUploadFilesVisible, onFilesChange }: Props) => {  
   const [files, setFiles] = useState<any>([]);  
   const [progress, setProgress] = useState(0);  
   const [uploadStarted, setUploadStarted] = useState(false);  
@@ -30,6 +32,7 @@ const FilePicker = ({ folderPath, tags }: Props) => {
     setFiles(filesArray as any);  
     setProgress(0);  
     setUploadStarted(false);  
+    onFilesChange(filesArray);
   }, []);  
   
   // handle for removing files form the files list view  
@@ -142,7 +145,7 @@ const FilePicker = ({ folderPath, tags }: Props) => {
         </div>  
       ) : null}  
       {/* upload button */}  
-      {files.length ? (  
+      {isBtnUploadFilesVisible && files.length ? (  
         <button  
           onClick={handleUpload}  
           className={classNames(  

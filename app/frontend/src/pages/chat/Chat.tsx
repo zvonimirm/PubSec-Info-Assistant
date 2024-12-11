@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator, Toggle, Label } from "@fluentui/react";
 import Switch from 'react-switch';
 import { GlobeFilled, BuildingMultipleFilled, AddFilled, ChatSparkleFilled } from "@fluentui/react-icons";
@@ -27,6 +27,7 @@ import { InfoContent } from "../../components/InfoContent/InfoContent";
 import { FolderPicker } from "../../components/FolderPicker";
 import { TagPickerInline } from "../../components/TagPicker";
 import React from "react";
+import * as mammoth from "mammoth";
 import { LegalAssistantEntry } from "../../components/LegalAssistant/LegalAssistantEntry";
 import {LegalAssistant} from "../../components/LegalAssistant/LegalAssistant";
 
@@ -75,7 +76,8 @@ const Chat = () => {
     const [answerStream, setAnswerStream] = useState<ReadableStream | undefined>(undefined);
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
-    const [isLAEntryPointVisible, setAssistentPointVisible] = useState(true);
+    const [isLAEntryPointVisible, setAssistentEntryPointVisible] = useState(true);
+    const [fileText, setFileText] = useState<string[]>([]);
 
     async function fetchFeatureFlags() {
         try {
@@ -87,20 +89,22 @@ const Chat = () => {
         }
     }
 
-    const handleLegalAssistantClick = () => {
-        setAssistentPointVisible(false);
+    const handleLegalAssistantEntryClick = () => {
+        setAssistentEntryPointVisible(false);
     }
 
 
     const makeApiRequest = async (question: string, approach: Approaches, 
                                 work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
-                                thought_chain: { [key: string]: string}) => {
+                                thought_chain: { [key: string]: string },
+                                display_question?: string) => {
         lastQuestionRef.current = question;
         lastQuestionWorkCitationRef.current = work_citation_lookup;
         lastQuestionWebCitiationRef.current = web_citation_lookup;
         lastQuestionThoughtChainRef.current = thought_chain;
         setActiveApproach(approach);
+        setDefaultApproach(approach);
 
         error && setError(undefined);
         setIsLoading(true);
@@ -108,6 +112,7 @@ const Chat = () => {
         setActiveAnalysisPanelTab(undefined);
 
         try {
+            const display_question_text = display_question || question;
             const history: ChatTurn[] = answers.map(a => ({ user: a[0], bot: a[1].answer }));
             const request: ChatRequest = {
                 history: [...history, { user: question, bot: undefined }],
@@ -144,7 +149,7 @@ const Chat = () => {
                 web_citation_lookup: {}
             };
 
-            setAnswers([...answers, [question, temp]]);
+            setAnswers([...answers, [display_question_text, temp]]);
             const controller = new AbortController();
             setAbortController(controller);
             const signal = controller.signal;
@@ -347,32 +352,136 @@ const Chat = () => {
         setAnswers(newItems);
     }
 
-    const handleGetSummary = () => {
-        console.log(getDummyText());   
+   
+    const handleUpload = async (files: any)  => {  
+       
+        try { 
+            const data = new FormData();  
+            console.log("files", files);  
+            let uploadedFilesCount = 0;
+
+            const uploadPromises = files.map(async (indexedFile:any, index:any) => {  
+                const file = indexedFile.file as File;  
+                const filePath =  file.name; //`${"VSRH"}/${file.name}`;  
+          
+                // Append file and other data to FormData  
+                data.append("file", file);  
+                data.append("file_path", filePath);  
+                
+                
+          
+                try {  
+                  const response = await fetch("/file", {  
+                    method: "POST",  
+                    body: data,  
+                  });  
+          
+                  if (!response.ok) {  
+                    throw new Error(`Failed to upload file: ${filePath}`);  
+                  }  
+          
+                  const result = await response.json();  
+                  console.log(result);  
+                } catch (error) {  
+                  console.log("Unable to upload file " + filePath + " : Error: " + error);  
+                
+
+              
+                }  
+                // Increment the counter for successfully uploaded files
+                uploadedFilesCount++;
+              
+              });
+        } catch (error) {  
+            console.log("Unable to upload file " +"  : Error: " + error);  
+        }
+    }
+    const [fileContent, setFileContent] = useState<string>('');
+
+    useEffect(() => {
+        console.log(`Updated file content: ${fileContent}`);
+      }, [fileContent]);
+      
+    const readTextFromFile = async (files: any): Promise<string> => {
+        const readFile = (file: File) => {
+            return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (event.target && typeof event.target.result === 'string') {
+                        resolve(event.target.result);
+                    } else {
+                        reject(new Error("Failed to read file content"));
+                    }
+                };
+                reader.onerror = (error) => {
+                    console.error("Error reading file:", error);
+                    reject(error);
+                };
+                reader.readAsText(file);
+            });
+        };
+    
+        try {
+            const content = await readFile(files[0].file);
+            return content;
+        } catch (error) {
+            console.error("Error reading file:", error);
+            throw error;
+        }
     };
-    const getDummyText   = () => {return `Broj: Revd 999/9999-9
-        U  I M E  R E P U B L I K E  H R V A T S K E
-        R J E Š E N J E
-        Vrhovni sud Republike Hrvatske u vijeću sastavljenom od sudaca Joška Radića, predsjednika vijeća Zrinke Gligo članice vijeća i sutkinje izvjestiteljice, mr. sc. Katarine Pavić člana vijeća, u pravnoj stvari tužiteljice X. X. iz G., OIB: ..., koju zastupa punomoćnica Y.Y., odvjetnica u O., protiv tuženika T.T. iz Bosne i Hercegovine, I., OIB: ..., kojeg zastupaju punomoćnici, odvjetnici iz Odvjetničkog društva U. P. j.t.d., O., radi smetanja posjeda, odlučujući o prijedlogu tužiteljice za dopuštenje revizije protiv rješenja Županijskog suda u Puli-Pola poslovni broj Gž-888/8888-2 od 30. lipnja 8888., Koji je potvrđeno rješenje Općinskog suda u Makarskoj poslovni broj Psp-32/7777 od 1. ožujka 7777., u sjednici održanoj 25. siječnja 2024.,
-        r i j e š i o  j e:
-        Prijedlog tužiteljice za dopuštenje revizije se odbija.
-        Obrazloženje
-        1. Tužiteljica je podnijela prijedlog za dopuštenje revizije protiv rješenja Županijskog
-        suda u Puli-Pola poslovni broj Gž-888/8888-2 od 30. lipnja 8888., kojim je potvrđeno
-        rješenje Općinskog suda u Makarskoj poslovni broj Psp-32/7777 od 1. ožujka 2023. u
-        kojem je naznačila tri pitanja koja smatra važnim za odluku u sporu i za osiguranje
-        jedinstvene primjene prava i ravnopravnosti svih u njegovoj primjeni, a koja glase:
-        "1. Kod tužbi za smetanje posjeda, je li teret dokazivanja dana saznanja za čin smetanja posjeda i za počinitelja na tužitelju i računa li se od saznanja kumulativno za čin smetanja i za počinitelja?
-        2. Veže li se datum subjektivnog saznanja za čin smetanja posjeda i za počinitelja za činjenicu sklapanja npr. ugovora o kupoprodaji temeljem kojeg je počinitelj uveden u posjed ili za faktični čin smetanja konkretnog počinitelja?
-        3. Ako je kod prvog smetanja posjeda dotadašnji posjednik posegao za samopomoći, pa se smetanje opet dogodilo nakon čega je ustao sa tužbom računa li se datum saznanja za čin smetanja i za počinitelja od tog posljednjeg smetanja?"
-        2. Odgovor na prijedlog nije podnesen.
-        3. Postupajući u skladu s odredbama čl. 385.a i čl. 387. Zakona o parničnom postupku ("Narodne novine", broj 53/91, 91/92, 112/99, 88/01, 117/03, 88/05, 2/07, 84/08, 96/08, 123/08, 57/11, 148/11, 25/13, 28/13, 89/14, 70/19 i 80/22 – dalje: ZPP), revizijski sud je ocijenio da se pitanja naznačena u prijedlogu za dopuštenje revizije ne mogu smatrati važnim pravnim pitanjem za osiguranje jedinstvene primjene prava i ravnopravnosti svih u njegovoj primjeni ili za razvoj prava kroz sudsku praksu. Naime, iz sadržaja prvog dijela pitanja pod 1. proizlazi da tužiteljica u biti prigovara činjeničnom utvrđenju glede dana saznanja za čin smetanja posjeda i za počinitelja, pa kako u revizijskom stupnju postupka to ne može biti predmet razmatranja, nije riječ o pitanju koje ima u vidu odredba čl. 385.a ZPP, dok odgovor na drugi dio pitanja proizlazi iz odredbe čl. 21. st. 3. Zakona o vlasništvu i drugim stvarnim pravima ("Narodne novine", broj 91/96, 66/98, 137/99, 22/00, 73/00, 114/01, 79/06, 141/06, 146/08, 38/09, 153/09, 143/12, 152/14, 81/15 i 94/17), a koja odredba je jasna i nije ju potrebno posebno tumačiti.
-        3.1. Odgovor na drugo pitanje naznačeno u prijedlogu za dopuštenje revizije ovisi o utvrđenim činjenicama i okolnostima svakog konkretnog slučaja, slijedom čega pitanje nema element univerzalnosti, a da bi bila riječ o pitanju iz čl. 385.a ZPP.
-        3.2. Trećim pitanjem tužiteljica pokušava dovesti u sumnju pravilnost pobijane odluke, vlastitim tvrdnjama bez realne podloge u sadržaju spisa, slijedom čega, niti to pitanje ne opravdava intervenciju ovog suda u smislu odredbe čl. 385.a ZPP i dopuštenje revizije.
-        5. Slijedom navedenog, kako u ovoj pravnoj stvari nisu ispunjene pretpostavke za postupanje revizijskog suda sukladno čl. 385.a st. 1. ZPP i dopuštenje revizije, na temelju odredbe čl. 389.b st. 1. i 2. ZPP, riješeno je kao u izreci.
-        Zagreb, 25. siječnja 2024.
-        Zrinka Gligo
-    `}
+
+    const readTextFromDocxFile = async (file: any): Promise<string> => {
+        try {
+          const arrayBuffer = await file.arrayBuffer(); // Read file as ArrayBuffer
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          return result.value;
+        } catch (error) {
+          console.error("Error reading .docx file:", error);
+          setFileContent("Failed to read the document.");
+          return "Failed to read the document.";
+        }
+      };
+
+    // Generiraj sažetak dokumenta (todo više njih?)
+    const handleSummaryClick = async (text: string, files: any) => {
+        let content = '';
+        content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
+    
+        let diplay_question = `Generiram sažetak dokumenta: ${files[0].file.name}`;
+        makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.GPTDirect, {}, {}, {}, diplay_question);
+    };
+
+    //Upload na blob storage (PoC - za kasnije integraciju s eSpisom)
+    const handleBlobStorage = async (text: string, files: any) => {
+        console.log("handleBlobStorage ", files[0].file.name);
+        await handleUpload(files);
+    
+    };
+
+    //Generiraj prijedlog odluke
+    const handleDecisionProposal = async (text: string, files: any) => {
+        let content = '';
+    
+        content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
+    
+        let diplay_question = `Generiram prijedlog odluke na temelju učitanog dokumenta: ${files[0].file.name} i ostalih sličnih dokumenata u sustavu`;
+        makeApiRequest(`Generiraj mi prijedlog odluke na temelju ovog teksta i sličnih dokumenata: ${content}`, Approaches.DocumentSummary, {}, {}, {}, diplay_question);
+        
+    };
+    const handleLegalAssistantAction = (text: string, files: any) => {
+        clearChat();
+        setAssistentEntryPointVisible(true);
+
+        if (text.includes("Summary")) {
+            handleSummaryClick(text, files);
+        } else if (text.includes("BlobStorage")) {
+            handleBlobStorage(text, files);
+        } else if (text.includes("Decision")) {
+            handleDecisionProposal(text, files);
+        }
+    };
+
+
     return (
         <div className={styles.container}>
             <div className={styles.subHeader}>
@@ -422,7 +531,7 @@ const Chat = () => {
                             }
                         </div>
                         <div>
-                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantClick}/>
+                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantEntryClick}/>
                         </div>
                         </div>
 
@@ -496,7 +605,7 @@ const Chat = () => {
             }
             {
                 !isLAEntryPointVisible &&
-                    <LegalAssistant onEvent = {handleGetSummary} folderPath={""} tags={[]} />
+                    <LegalAssistant onEvent = {handleLegalAssistantAction} />
             }
                 {answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel
@@ -579,3 +688,17 @@ const Chat = () => {
 };
 
 export default Chat;
+async function GetText(files: any, content: string, readTextFromFile: (files: any) => Promise<string>, readTextFromDocxFile: (file: any) => Promise<string>) {
+    
+    if (files[0].file.name.endsWith('.txt')) {
+        console.log("handleSummaryClick for .txt file", files[0].file.name);
+        content = await readTextFromFile(files);
+    } else if (files[0].file.name.endsWith('.docx')) {
+        console.log("handleSummaryClick for .docx file", files[0].file.name);
+        content = await readTextFromDocxFile(files[0].file);
+    } else {
+        console.log("Unsupported file type", files[0].file.name);
+    }
+    return content;
+}
+
