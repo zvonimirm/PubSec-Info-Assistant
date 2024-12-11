@@ -14,7 +14,7 @@ export const AnswerIcon: React.FC<AnswerIconProps> = ({ approach }) => {
     if (approach == Approaches.ChatWebRetrieveRead) {
         return <div className={styles.answerLogoWeb}><Globe24Filled primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="Web Answer logo" /> Web</div>;
         }
-    else if (approach == Approaches.ReadRetrieveRead) {
+    else if (approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary) {
         return <div className={styles.answerLogoWork}><BuildingMultiple24Filled primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Work Answer logo" /> Dokumenti</div>;
         }
     else if (approach == Approaches.CompareWebWithWork) {

@@ -105,7 +105,7 @@ const Chat = () => {
         lastQuestionThoughtChainRef.current = thought_chain;
         setActiveApproach(approach);
         setDefaultApproach(approach);
-        
+
         error && setError(undefined);
         setIsLoading(true);
         setActiveCitation(undefined);
@@ -354,70 +354,55 @@ const Chat = () => {
 
    
     const handleUpload = async (files: any)  => {  
+       
+        try { 
+            const data = new FormData();  
+            console.log("files", files);  
+            let uploadedFilesCount = 0;
 
-        console.log("Handling case two with text:"); 
-        try {  
-          const data = new FormData();  
-          console.log("files", files);  
-        // //   setUploadStarted(true);  
-        //   let uploadedFilesCount = 0;
-      
-        //   const uploadPromises = files.map(async (indexedFile:any, index:any) => {  
-        //     const file = indexedFile.file as File;  
-        //     // const filePath = folderPath === "" ? file.name : `${folderPath}/${file.name}`;  
-            const filePath = files[0].name;  
-      
-        //     // Append file and other data to FormData  
-            data.append("file", files[0]);  
-            data.append("file_path", filePath);  
-            
-        //     if (tags.length > 0) {
-        //       data.append("tags", tags.map(encodeURIComponent).join(",")); 
-        //     }
-      
-            try {  
-              const response = await fetch("/file", {  
-                method: "POST",  
-                body: data,  
-              });  
-      
-              if (!response.ok) {  
-                throw new Error(`Failed to upload file: ${filePath}`);  
-              }  
-      
-              const result = await response.json();  
-              console.log(result);  
-      
-        //       // Write status to log  
-        //       const logEntry: StatusLogEntry = {  
-        //         path: "upload/" + filePath,  
-        //         status: "File uploaded from browser to backend API",  
-        //         status_classification: StatusLogClassification.Info,  
-        //         state: StatusLogState.Uploaded,  
-        //       };  
-        //       await logStatus(logEntry);
-              
-            } catch (error) {  
-              console.log("Unable to upload file " + filePath + " : Error: " + error);  
-            }  
-        //     // Increment the counter for successfully uploaded files
-        //     uploadedFilesCount++;
-        //     setProgress((uploadedFilesCount / files.length) * 100);
+            const uploadPromises = files.map(async (indexedFile:any, index:any) => {  
+                const file = indexedFile.file as File;  
+                const filePath =  file.name; //`${"VSRH"}/${file.name}`;  
           
-        //   });
-      
-        //   await Promise.all(uploadPromises);  
-        //   setUploadStarted(false);  
+                // Append file and other data to FormData  
+                data.append("file", file);  
+                data.append("file_path", filePath);  
+                
+                
+          
+                try {  
+                  const response = await fetch("/file", {  
+                    method: "POST",  
+                    body: data,  
+                  });  
+          
+                  if (!response.ok) {  
+                    throw new Error(`Failed to upload file: ${filePath}`);  
+                  }  
+          
+                  const result = await response.json();  
+                  console.log(result);  
+                } catch (error) {  
+                  console.log("Unable to upload file " + filePath + " : Error: " + error);  
+                
+
+              
+                }  
+                // Increment the counter for successfully uploaded files
+                uploadedFilesCount++;
+              
+              });
         } catch (error) {  
-          console.log(error);  
-        }  
-        //   , [files, folderPath, tags]);
-    };
+            console.log("Unable to upload file " +"  : Error: " + error);  
+        }
+    }
     const [fileContent, setFileContent] = useState<string>('');
 
+    useEffect(() => {
+        console.log(`Updated file content: ${fileContent}`);
+      }, [fileContent]);
+      
     const readTextFromFile = async (files: any): Promise<string> => {
-        console.log("Reading file - start");
-    
         const readFile = (file: File) => {
             return new Promise<string>((resolve, reject) => {
                 const reader = new FileReader();
@@ -428,12 +413,10 @@ const Chat = () => {
                         reject(new Error("Failed to read file content"));
                     }
                 };
-    
                 reader.onerror = (error) => {
                     console.error("Error reading file:", error);
                     reject(error);
                 };
-    
                 reader.readAsText(file);
             });
         };
@@ -446,9 +429,6 @@ const Chat = () => {
             throw error;
         }
     };
-    useEffect(() => {
-        console.log(`Updated file content: ${fileContent}`);
-      }, [fileContent]);
 
     const readTextFromDocxFile = async (file: any): Promise<string> => {
         try {
@@ -462,33 +442,31 @@ const Chat = () => {
         }
       };
 
+    // Generiraj sažetak dokumenta (todo više njih?)
     const handleSummaryClick = async (text: string, files: any) => {
         let content = '';
-    
-        if (files[0].file.name.endsWith('.txt')) {
-            console.log("handleSummaryClick for .txt file", files[0].file.name);
-            content = await readTextFromFile(files);
-        } else if (files[0].file.name.endsWith('.docx')) {
-            console.log("handleSummaryClick for .docx file", files[0].file.name);
-            content = await readTextFromDocxFile(files[0].file);
-            console.log("content", content);    
-        } else {
-            console.log("Unsupported file type", files[0].file.name);
-        }
+        content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
     
         let diplay_question = `Generiram sažetak dokumenta: ${files[0].file.name}`;
-        setFileContent(content);
-        setActiveApproach(Approaches.DocumentSummary);
         makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.GPTDirect, {}, {}, {}, diplay_question);
     };
 
+    //Upload na blob storage (PoC - za kasnije integraciju s eSpisom)
     const handleBlobStorage = async (text: string, files: any) => {
         console.log("handleBlobStorage ", files[0].file.name);
+        await handleUpload(files);
+    
     };
 
-    const handleDecisionProposal = (text: string, files: any) => {
-        console.log("handleDecisionProposal:", text);
-        // Add your logic for case three here
+    //Generiraj prijedlog odluke
+    const handleDecisionProposal = async (text: string, files: any) => {
+        let content = '';
+    
+        content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
+    
+        let diplay_question = `Generiram prijedlog odluke na temelju učitanog dokumenta: ${files[0].file.name} i ostalih sličnih dokumenata u sustavu`;
+        makeApiRequest(`Generiraj mi prijedlog odluke na temelju ovog teksta i sličnih dokumenata: ${content}`, Approaches.DocumentSummary, {}, {}, {}, diplay_question);
+        
     };
     const handleLegalAssistantAction = (text: string, files: any) => {
         clearChat();
@@ -710,3 +688,17 @@ const Chat = () => {
 };
 
 export default Chat;
+async function GetText(files: any, content: string, readTextFromFile: (files: any) => Promise<string>, readTextFromDocxFile: (file: any) => Promise<string>) {
+    
+    if (files[0].file.name.endsWith('.txt')) {
+        console.log("handleSummaryClick for .txt file", files[0].file.name);
+        content = await readTextFromFile(files);
+    } else if (files[0].file.name.endsWith('.docx')) {
+        console.log("handleSummaryClick for .docx file", files[0].file.name);
+        content = await readTextFromDocxFile(files[0].file);
+    } else {
+        console.log("Unsupported file type", files[0].file.name);
+    }
+    return content;
+}
+
