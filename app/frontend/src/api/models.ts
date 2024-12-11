@@ -14,7 +14,8 @@ export const enum Approaches {
     GPTDirect = 3,
     ChatWebRetrieveRead = 4,
     CompareWorkWithWeb = 5,
-    CompareWebWithWork = 6
+    CompareWebWithWork = 6,
+    DocumentSummary = 7,
 }
 
 export type ChatRequestOverrides = {

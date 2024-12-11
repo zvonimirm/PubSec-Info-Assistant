@@ -14,6 +14,7 @@ class Approaches(Enum):
     ChatWebRetrieveRead = 4
     CompareWorkWithWeb = 5
     CompareWebWithWork = 6
+    DocumentSummary = 7
 
 class Approach:
     """
