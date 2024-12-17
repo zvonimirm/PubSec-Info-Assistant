@@ -13,7 +13,7 @@ interface Props {
 export const UserChatMessage = ({ message, approach }: Props) => {
     return (
         <div className={approach == Approaches.GPTDirect ? styles.containerUngrounded : styles.container}>
-            <div className={approach == Approaches.ChatWebRetrieveRead ? styles.messageweb : approach == Approaches.ReadRetrieveRead ? styles.messagework : approach == Approaches.GPTDirect ? styles.messageungrounded : styles.messagecompare}>
+            <div className={approach == Approaches.ChatWebRetrieveRead ? styles.messageweb : (approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary ) ? styles.messagework : approach == Approaches.GPTDirect ? styles.messageungrounded : styles.messagecompare}>
                 {
                 approach == Approaches.ReadRetrieveRead ? 
                     <span style={{ marginRight: '10px' }}><BuildingMultiple20Filled primaryFill={"rgba(255, 255, 225, 1)"}/></span> : 

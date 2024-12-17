@@ -58,7 +58,7 @@ export const Answer = ({
     const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, answer.approach, answer.work_citation_lookup, answer.web_citation_lookup, answer.thought_chain, onCitationClicked), [answer]);
 
     return (
-        <Stack className={`${answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary ? styles.answerContainerWork : 
+        <Stack className={`${(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary) ? styles.answerContainerWork : 
                             answer.approach == Approaches.ChatWebRetrieveRead ? styles.answerContainerWeb :
                             answer.approach == Approaches.CompareWorkWithWeb || answer.approach == Approaches.CompareWebWithWork ? styles.answerContainerCompare :
                             answer.approach == Approaches.GPTDirect ? styles.answerContainerUngrounded :
@@ -109,7 +109,7 @@ export const Answer = ({
                     /> }
             </Stack.Item>
 
-            {(parsedAnswer.approach == Approaches.ChatWebRetrieveRead && !!parsedAnswer.web_citations.length) && (
+            {((parsedAnswer.approach == Approaches.ChatWebRetrieveRead) && !!parsedAnswer.web_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>Citati:</span>
