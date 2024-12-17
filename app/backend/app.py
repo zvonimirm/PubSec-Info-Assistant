@@ -10,7 +10,7 @@ import os
 import json
 import urllib.parse
 import pandas as pd
-import pydantic
+from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile, Form
 from fastapi.responses import RedirectResponse, StreamingResponse
@@ -18,6 +18,7 @@ import openai
 from approaches.comparewebwithwork import CompareWebWithWork
 from approaches.compareworkwithweb import CompareWorkWithWeb
 from approaches.chatreadretrieveread import ChatReadRetrieveReadApproach
+from approaches.documentsummary import DocumentSummary
 from approaches.chatwebretrieveread import ChatWebRetrieveRead
 from approaches.gpt_direct_approach import GPTDirectApproach
 from approaches.approach import Approaches
@@ -106,7 +107,7 @@ log = logging.getLogger("uvicorn")
 log.setLevel('DEBUG')
 log.propagate = True
 
-class StatusResponse(pydantic.BaseModel):
+class StatusResponse(BaseModel):
     """The response model for the health check endpoint"""
     status: str
     uptime_seconds: float
@@ -198,6 +199,27 @@ else:
 
 chat_approaches = {
     Approaches.ReadRetrieveRead: ChatReadRetrieveReadApproach(
+                                    search_client,
+                                    ENV["AZURE_OPENAI_ENDPOINT"],
+                                    ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
+                                    ENV["KB_FIELDS_SOURCEFILE"],
+                                    ENV["KB_FIELDS_CONTENT"],
+                                    ENV["KB_FIELDS_PAGENUMBER"],
+                                    ENV["KB_FIELDS_CHUNKFILE"],
+                                    ENV["AZURE_BLOB_STORAGE_CONTAINER"],
+                                    blob_client,
+                                    ENV["QUERY_TERM_LANGUAGE"],
+                                    MODEL_NAME,
+                                    MODEL_VERSION,
+                                    ENV["TARGET_EMBEDDINGS_MODEL"],
+                                    ENV["ENRICHMENT_APPSERVICE_URL"],
+                                    ENV["TARGET_TRANSLATION_LANGUAGE"],
+                                    ENV["AZURE_AI_ENDPOINT"],
+                                    ENV["AZURE_AI_LOCATION"],
+                                    token_provider,
+                                    str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
+                                ),
+    Approaches.DocumentSummary: DocumentSummary(
                                     search_client,
                                     ENV["AZURE_OPENAI_ENDPOINT"],
                                     ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
@@ -325,6 +347,7 @@ async def chat(request: Request):
             return {"error": "unknown approach"}, 400
 
         if (Approaches(int(approach)) == Approaches.CompareWorkWithWeb or
+            Approaches(int(approach)) == Approaches.DocumentSummary or
             Approaches(int(approach)) == Approaches.CompareWebWithWork):
             r = impl.run(json_body.get("history", []),
                          json_body.get("overrides", {}),

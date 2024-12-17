@@ -45,7 +45,7 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
     var work_fragments: string[] = [];
     var web_fragments: string[] = [];
 
-    if (approach == Approaches.ChatWebRetrieveRead || approach == Approaches.ReadRetrieveRead) {
+    if (approach == Approaches.ChatWebRetrieveRead || approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary) {
         // Split the answer into parts, where the odd parts are citations
         const parts = parsedAnswer.split(/\[([^\]]+)\]/g);
         const pattern = /^\w+[0-9]$/;
