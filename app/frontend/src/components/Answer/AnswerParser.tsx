@@ -54,7 +54,7 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
                 // Even parts are just text
                 return part;
             } else {
-                if (approach == Approaches.ReadRetrieveRead) {
+                if (approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary) {
                     const citation_lookup = work_citation_lookup;
                     // LLM Sometimes refers to citations as "source"
                     part = part.replace(/\w+(\d)$/, 'File$1');

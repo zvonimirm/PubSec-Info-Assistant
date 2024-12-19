@@ -29,23 +29,20 @@ class DocumentSummary(Approach):
     an completion (answer) with that prompt."""
 
 
-    SYSTEM_MESSAGE_CHAT_CONVERSATION = """You are an Azure OpenAI Completion system. Your persona is {systemPersona} who helps with 
-    generating new similar documents based on the information provided in the inputText or in source documents. User persona is {userPersona}.
-    
-    This is inputText: "{response_length_prompt}".
-    
-    First, extract key information from the inputText. Subsequently, search for similar documents within the document database. 
-    Please provide citations for all referenced documents.
-    If the answer can only be found in the information provided in inputText, do not provide citations.
+    SYSTEM_MESSAGE_CHAT_CONVERSATION = """You are an Azure OpenAI Completion system. Your persona is {systemPersona} and User persona is {userPersona}.
 
-    Finally, generate a new document based on the gathered information. The new document should follow the same format as the existing documents in the database, 
-    with a header, rationale, and a similar overall layout.
-    Avoid making assumptions, generating speculative or generalized information or adding personal opinions.
-    
-    
-   
-    Each source has content followed by a pipe character and the URL. Instead of writing the full URL, cite it using placeholders like [File1], [File2], etc., based on their order in the list. Do not combine sources; 
-    list each source URL separately, e.g., [File1] [File2].
+    The input document is a complaint, and will be termed as "inputText". Our objective is to identify analogous complaints and generate a draft judgment.
+
+    Initially, we will extract key information from the complaint. These key information will be termed "key information". Utilizing the key information, we will conduct a search for similar cases.
+
+    Based on the precedents established in similar cases, a proposed judgment will be formulated.
+    All specific details such as names, surnames, and numerical identifiers must be obtained from the input document. The proposed judgment must align with the rulings found in the analogous cases.
+
+    Generate a document that adheres to the conventional format of judgments, including a header and appropriate sections.
+
+    The following similar cases should be cited. If there are no similar cases, the document should state that no similar cases were found.
+  
+    Each source has content followed by a pipe character and the URL. Instead of writing the full URL, cite it using placeholders like [File1], [File2], etc., based on their order in the list. Do not combine sources; list each source URL separately, e.g., [File1] [File2].
     Never cite the source content using the examples provided in this paragraph that start with info.
     Sources:
     - Content about topic A | info.pdf
@@ -53,11 +50,15 @@ class DocumentSummary(Approach):
 
     Reference these as [File1] and [File2] respectively in your answers.
 
+    Reference files respectively in your answers.
+
+    This is inputText: "{response_length_prompt}".
+
     Here is how you should answer every question:
     
-    -Start by extracting key information from the source documents and the query.
-    -Look for information in the source documents and in information from query to answer the question in {query_term_language}.
-    -Generate a new document based on the gathered information.
+    -Start by extracting key information from the inputText.
+    -Find similar legal cases in the source documents.
+    -Generate a new document based on the gathered information {query_term_language}.
     -At the end of answer, provide citations for all referenced documents.
     
     {follow_up_questions_prompt}
@@ -69,7 +70,8 @@ class DocumentSummary(Approach):
     Only generate follow-up questions and do not generate any text before or after the follow-up questions, such as 'Next Questions'
     """
 
-    QUERY_PROMPT_TEMPLATE = """Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching in source documents.
+    QUERY_PROMPT_TEMPLATE = """Generate a new document with the same structure and tone as the examples found in source documents.
+    Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching in source documents or cobbling together information from the conversation.
     Generate a search query based on the conversation and the new question. Treat each search term as an individual keyword. Do not combine terms in quotes or brackets.
     Do not include cited source filenames and document names e.g info.txt or doc.pdf in the search query terms.
     Do not include any text inside [] or <<<>>> in the search query terms.
@@ -78,13 +80,13 @@ class DocumentSummary(Approach):
     """
 
     QUERY_PROMPT_FEW_SHOTS = [
-        {'role' : Approach.USER, 'content' : 'What are the examples of revisions county court decisions?' },
-        {'role' : Approach.ASSISTANT, 'content' : 'Examples of revisions county court decisions' }
+        {'role' : Approach.USER, 'content' : 'Generate a new document based on similar cases in source documents.' },
+        {'role' : Approach.ASSISTANT, 'content' : 'Extract key infomration, find similar legal cases and generate a new document based on similar cases in source documents.' }
     ]
 
     RESPONSE_PROMPT_FEW_SHOTS = [
-        {"role": Approach.USER ,'content': 'I am looking for information in source documents and in information from query.'},
-        {'role': Approach.ASSISTANT, 'content': 'user is looking for information in source documents and in information from query. Do not provide answers that are not in the source documents or query information.'}
+        {"role": Approach.USER ,'content': 'Generate a new document based on similar cases in source documents.'},
+        {'role': Approach.ASSISTANT, 'content': 'User is expecting new document, where information is gathered from source documents and input text. Do not provide answers that are not in the source documents.'}
     ]
 
     def __init__(
