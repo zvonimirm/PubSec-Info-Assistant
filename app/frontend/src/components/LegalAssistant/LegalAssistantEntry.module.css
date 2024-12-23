@@ -33,5 +33,12 @@
 .image{
     width: 100px;
     height: 100px;
+    border-radius: 10%;
     margin: 0;
+    cursor: pointer;
+}
+
+.image:hover {
+    opacity: 0.8;
+    outline: 2px solid rgba(115, 118, 225, 1);
 }

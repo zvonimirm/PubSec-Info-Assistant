@@ -56,7 +56,9 @@ class DocumentSummary(Approach):
 
     Here is how you should answer every question:
     
-    -Start by extracting key information from the inputText.
+    -Start by extracting key information from the inputText. 
+    -Print key information in italic font. 
+    -Do not print entire inputText in the answer, just the draft judgment.
     -Find similar legal cases in the source documents.
     -Generate a new document based on the gathered information {query_term_language}.
     -At the end of answer, provide citations for all referenced documents.

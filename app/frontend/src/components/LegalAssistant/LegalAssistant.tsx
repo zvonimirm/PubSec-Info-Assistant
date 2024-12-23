@@ -50,11 +50,11 @@ const LegalAssistant = ({onEvent}: Props) => {
                             Generiranje sažetka dokumenata
                         </p>
                     </span>
-                    <span className={`${!isClickable ? styles.btnDisabled : styles.btnStyle}`} onClick={handleBlobStorage}>
+                    {/* <span className={`${!isClickable ? styles.btnDisabled : styles.btnStyle}`} onClick={handleBlobStorage}>
                         <p className={styles.exampleText}>
                             Dodavanje dokumenata <br/>u blob storage
                         </p>
-                    </span>
+                    </span> */}
                     <span className={`${!isClickable ? styles.btnDisabled : styles.btnStyle}`} onClick={handleDecisionProposal}>
                         <p className={styles.exampleText}>
                             Generiranje prijedloga odluke

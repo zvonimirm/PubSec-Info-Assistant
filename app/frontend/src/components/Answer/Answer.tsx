@@ -126,7 +126,7 @@ export const Answer = ({
                 </Stack.Item>
                 
             )}
-            {((parsedAnswer.approach == Approaches.ReadRetrieveRead || parsedAnswer.approach == Approaches.DocumentSummary )&& !!parsedAnswer.work_citations.length) && (
+            {((parsedAnswer.approach == Approaches.ReadRetrieveRead || parsedAnswer.approach == Approaches.DocumentSummary) && !!parsedAnswer.work_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>Citati:</span>
