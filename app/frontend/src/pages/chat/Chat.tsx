@@ -466,7 +466,7 @@ const Chat = () => {
         content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
     
         let diplay_question = `Generiram prijedlog odluke na temelju učitanog dokumenta: ${files[0].file.name} i ostalih sličnih dokumenata u sustavu`;
-        makeApiRequest(`Generiraj mi prijedlog rješenja na tužbu: ${content}`, Approaches.ReadRetrieveRead, {}, {}, {}, diplay_question);
+        makeApiRequest(`Generiraj mi prijedlog odluke na tužbu: ${content}`, Approaches.DocumentSummary, {}, {}, {}, diplay_question);
         
     };
     const handleLegalAssistantAction = (text: string, files: any) => {

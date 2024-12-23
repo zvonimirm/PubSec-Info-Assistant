@@ -29,43 +29,54 @@ class DocumentSummary(Approach):
     an completion (answer) with that prompt."""
 
 
-    SYSTEM_MESSAGE_CHAT_CONVERSATION = """You are an Azure OpenAI Completion system. Your persona is {systemPersona} and User persona is {userPersona}.
+    # SYSTEM_MESSAGE_CHAT_CONVERSATION = """You are an Azure OpenAI Completion system. Your persona is {systemPersona} and User persona is {userPersona}.
 
-    The input document is a complaint, and will be termed as "inputText". Our objective is to identify analogous complaints and generate a draft judgment.
+    # The input document is a complaint. In source documents you can find judgments. 
+ 
+    # Based on the input complaint, find similar cases and generate a document that will be a draft decision for input complaint. 
+    # Specific details such as names, surnames, and numerical identifiers must be obtained from the the input lawsuit.
+    # Propose current date in header.
+    # Generate a document that adheres to the conventional format of judgments, including a header and appropriate sections.
 
-    Initially, we will extract key information from the complaint. These key information will be termed "key information". Utilizing the key information, we will conduct a search for similar cases.
-
-    Based on the precedents established in similar cases, a proposed judgment will be formulated.
-    All specific details such as names, surnames, and numerical identifiers must be obtained from the input document. The proposed judgment must align with the rulings found in the analogous cases.
-
-    Generate a document that adheres to the conventional format of judgments, including a header and appropriate sections.
-
-    The following similar cases should be cited. If there are no similar cases, the document should state that no similar cases were found.
+    # The following similar cases should be cited. If there are no similar cases, the document should state that no similar cases were found.
   
-    Each source has content followed by a pipe character and the URL. Instead of writing the full URL, cite it using placeholders like [File1], [File2], etc., based on their order in the list. Do not combine sources; list each source URL separately, e.g., [File1] [File2].
-    Never cite the source content using the examples provided in this paragraph that start with info.
-    Sources:
-    - Content about topic A | info.pdf
-    - Content about topic B | example.txt
+    # Each source has content followed by a pipe character and the URL. Instead of writing the full URL, cite it using placeholders like [File1], [File2], etc., based on their order in the list. 
+    # Do not combine sources; list each source URL separately, e.g., [File1] [File2].
+    # Never cite the source content using the examples provided in this paragraph that start with info.
 
-    Reference these as [File1] and [File2] respectively in your answers.
-
-    Reference files respectively in your answers.
-
-    This is inputText: "{response_length_prompt}".
-
-    Here is how you should answer every question:
     
-    -Start by extracting key information from the inputText. 
-    -Print key information in italic font. 
-    -Do not print entire inputText in the answer, just the draft judgment.
-    -Find similar legal cases in the source documents.
-    -Generate a new document based on the gathered information {query_term_language}.
-    -At the end of answer, provide citations for all referenced documents.
+    # This is inputText: "{response_length_prompt}".
+
+    # Here is how you should answer every question:
     
-    {follow_up_questions_prompt}
+    # -Find similar legal cases in the source documents. 
+    # -Generate a new document, draft judgment, based on the gathered information {query_term_language}.
+    # -Do not print entire inputText in the answer, just the draft judgment.
+    # -At the end of answer, provide citations for all referenced documents.
+
+    # {follow_up_questions_prompt}
+    # {injected_prompt}
+
+
+    # """
+    SYSTEM_MESSAGE_CHAT_CONVERSATION = """ Ti si Azure OpenAI Completion sistem. Tvoja persona je {systemPersona} a korisnička persona je {userPersona}.
+    
+    Ulazni dokument je tužba. U izvornim dokumentima možeš pronaći presude.
+    Generiraj mi prijedlog odluke za tužbu na temelju sličnih slučajeva iz izvornih dokumenata.
+    Prijedlog odluke mora izgledati kao postojeće odluke u izvornim dokumentima. Znači mora imati "U IME REPUBLIKE HRVATSKE RJEŠENJE", "RIJEŠIO JE" i "OBRAZLOŽENJE".
+    Format teksta mora izgledati kao prava odluka s naslovom, zaglavljem i odgovarajućim odjeljcima. Naslovi moraju biti podebljani.
+    Specifični detalji poput imena, prezimena i brojeva moraju biti preuzeti iz ulazne tužbe.
+    Imena članova vijeća ne navoditi, nego ostaviti praznu crtu za naknadni upis.
+   
+   U podnožju dokumenta treba ostaviti prostor za unos današnjeg datuma.
+
+    Navedi mi citate sličnih slučajeva. Ako nema sličnih slučajeva, dokument treba navesti da nisu pronađeni slični slučajevi.
+    Citate treba navesti na kraju dokumenta. Koristi oznake poput [File1], [File2], itd., prema njihovom redoslijedu u popisu.
+
+
     {injected_prompt}
     """
+
 
     FOLLOW_UP_QUESTIONS_PROMPT_CONTENT = """ALWAYS generate three very brief unordered follow-up questions surrounded by triple chevrons (<<<Are there exclusions for prescriptions?>>>) that the user would likely ask next about their agencies data. 
     Surround each follow-up question with triple chevrons (<<<Are there exclusions for prescriptions?>>>). Try not to repeat questions that have already been asked.
@@ -82,13 +93,13 @@ class DocumentSummary(Approach):
     """
 
     QUERY_PROMPT_FEW_SHOTS = [
-        {'role' : Approach.USER, 'content' : 'Generate a new document based on similar cases in source documents.' },
-        {'role' : Approach.ASSISTANT, 'content' : 'Extract key infomration, find similar legal cases and generate a new document based on similar cases in source documents.' }
+        {'role' : Approach.USER, 'content' : 'Generate a draft judgment based on similar cases in source documents.' },
+        {'role' : Approach.ASSISTANT, 'content' : 'Find similar legal cases and generate a new draft judgment based on similar cases in source documents.' }
     ]
 
     RESPONSE_PROMPT_FEW_SHOTS = [
-        {"role": Approach.USER ,'content': 'Generate a new document based on similar cases in source documents.'},
-        {'role': Approach.ASSISTANT, 'content': 'User is expecting new document, where information is gathered from source documents and input text. Do not provide answers that are not in the source documents.'}
+        {"role": Approach.USER ,'content': 'Generate a draft judgment based on similar cases in source documents.'},
+        {'role': Approach.ASSISTANT, 'content': 'User is expecting a draft judgment, where information is gathered from source documents and input text. Do not provide answers that are not in the source documents.'}
     ]
 
     def __init__(
