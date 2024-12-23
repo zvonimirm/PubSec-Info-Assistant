@@ -25,9 +25,9 @@ const Banner = ({ onClick, onDrop }: {onClick: any, onDrop: any}) => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <span className={styles.banner_text}>Click to Add files</span>
-      <span className={styles.banner_text}>Or</span>
-      <span className={styles.banner_text}>Drag and Drop files here</span>
+      <span className={styles.banner_text}>Kliknite za dodavanje</span>
+      <span className={styles.banner_text}>ili</span>
+      <span className={styles.banner_text}>povucite i ispustite datoteke ovdje</span>
     </div>
   );
 };

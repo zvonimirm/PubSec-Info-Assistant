@@ -3,6 +3,7 @@
 
 import { Outlet, NavLink, Link } from "react-router-dom";
 import openai from "../../assets/openai.svg";
+import legalAssistant from "../../assets/icon-legal-ai.webp";
 import { WarningBanner } from "../../components/WarningBanner/WarningBanner";
 import styles from "./Layout.module.css";
 import { Title } from "../../components/Title/Title";
