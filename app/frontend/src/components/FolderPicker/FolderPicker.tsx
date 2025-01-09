@@ -78,7 +78,7 @@ export const FolderPicker = ({allowFolderCreation, onSelectedKeyChange, preSelec
     };
 
     const examplePrimaryButtonProps: IButtonProps = {
-        children: 'Create folder',
+        children: 'Kreiraj mapu',
         onClick: teachingBubblePrimaryButtonClick,
     };
 
@@ -182,12 +182,12 @@ export const FolderPicker = ({allowFolderCreation, onSelectedKeyChange, preSelec
                 <ComboBox
                     multiSelect={allowNewFolders? false : true}
                     selectedKey={selectedKeys}
-                    label={allowNewFolders? "Folder Selection" : "Folder Selection (Select multiple folders)"}
+                    label={allowNewFolders? "Odabir mape" : "Odabir mape (Višestruki odabir mapa)"}
                     options={options}
                     onChange={onChange}
                     styles={comboBoxStyles}
                 />
-                <TooltipHost content={allowNewFolders ? "Select a folder to upload documents into" : "Select a folder to filter the search by"}
+                <TooltipHost content={allowNewFolders ? "Odaberite mapu za prijenos dokumenata" : "Odaberite mapu po kojoj će se filtrirati pretraga"}
                         styles={hostStyles}
                         id={tooltipId}>
                     <Info16Regular></Info16Regular>
@@ -200,19 +200,19 @@ export const FolderPicker = ({allowFolderCreation, onSelectedKeyChange, preSelec
                         allowDisabledFocus
                         onClick={toggleTeachingBubbleVisible}
                         id={buttonId}>
-                        Create new folder
+                        Kreiraj novu mapu
                     </ActionButton>
                     {teachingBubbleVisible && (
                         <TeachingBubble
                         target={`#${buttonId}`}
                         primaryButtonProps={examplePrimaryButtonProps}
                         onDismiss={toggleTeachingBubbleVisible}
-                        headline="Create new folder"
+                        headline="Kreiraj novu mapu"
                         calloutProps={{ directionalHint: DirectionalHint.topCenter }}
                         styles={teachingBubbleStyles}
                         hasCloseButton={true}
                         >
-                        <TextField id={textFieldId} label='Folder Name:' required={true} styles={getStyles}/>
+                        <TextField id={textFieldId} label='Naziv mape:' required={true} styles={getStyles}/>
                         </TeachingBubble>
                     )}
                 </div>) : ""}

@@ -129,7 +129,7 @@ export const TagPickerInline = ({allowNewTags, onSelectedTagsChange, preSelected
       <div  className={hide? styles.hide : styles.tagArea}>
         <div className={styles.tagSelection}>
           <div className={allowAddNew ? styles.rootClass : styles.rootClassFilter}>
-            <label htmlFor={pickerId}>Tags</label>
+            <label htmlFor={pickerId}>Oznake</label>
             <TagPicker
                 className={styles.tagPicker}
                 removeButtonAriaLabel="Remove"
@@ -149,7 +149,7 @@ export const TagPickerInline = ({allowNewTags, onSelectedTagsChange, preSelected
                 onChange={onChange}
             />
           </div>
-          <TooltipHost content={allowAddNew ? "Tags to append to each document uploaded below." : "Tags to filter documents by."}
+          <TooltipHost content={allowAddNew ? "Oznake koje će se pridužiti svakom dokumentu" : "Oznake po kojima se filtriraju dokumenti"}
                     styles={hostStyles}
                     id={tooltipId}>
             <Info16Regular></Info16Regular>
