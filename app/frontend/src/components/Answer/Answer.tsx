@@ -149,6 +149,8 @@ export const Answer = ({
                             answer.approach == Approaches.CompareWorkWithWeb || answer.approach == Approaches.CompareWebWithWork ? styles.answerContainerCompare :
                             answer.approach == Approaches.GPTDirect ? styles.answerContainerUngrounded :
                             styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
+            
+            {/* Proces razmišljanja */}
             <Stack.Item>
                 <Stack horizontal horizontalAlign="space-between">
                     <AnswerIcon approach={answer.approach} />
@@ -177,6 +179,7 @@ export const Answer = ({
                 </Stack>
             </Stack.Item>
 
+            {/* Vaši poslovni i privatni podaci su zaštićeni */}
             <Stack.Item grow>
                 {(answer.approach != Approaches.GPTDirect) &&
                     <div className={styles.protectedBanner}>
@@ -195,6 +198,7 @@ export const Answer = ({
                     /> }
             </Stack.Item>
 
+            {/* Citati */}
             {((parsedAnswer.approach == Approaches.ChatWebRetrieveRead) && !!parsedAnswer.web_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
@@ -212,11 +216,19 @@ export const Answer = ({
                 </Stack.Item>
                 
             )}
-            {((parsedAnswer.approach == Approaches.ReadRetrieveRead || parsedAnswer.approach == Approaches.DocumentSummary) && !!parsedAnswer.work_citations.length) && (
+
+
+
+            {(parsedAnswer.approach == Approaches.DocumentSummary  && !!parsedAnswer.work_citations.length) &&(
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <div className={styles.downloadFile} onClick={() => onDownloadClick(parsedAnswer.answerHtml)}> Preuzmite prijedlog odluke </div>
                     </Stack>
+                </Stack.Item>
+            )}
+
+            {((parsedAnswer.approach == Approaches.ReadRetrieveRead || parsedAnswer.approach == Approaches.DocumentSummary) && !!parsedAnswer.work_citations.length) && (
+                <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>Citati:</span>
                         {parsedAnswer.work_citations.map((x, i) => {
