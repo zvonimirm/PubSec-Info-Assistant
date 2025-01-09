@@ -32,13 +32,13 @@ export const InfoContent = ({ className }: Props) => {
 
     return (
         <div>
-            <Separator>Build and Version</Separator>
+            <Separator>Verzija</Separator>
             <Text>{appVersionInfo?.version}</Text>
             <Separator>Azure OpenAI</Separator>
-            <Label>Instance</Label><Text>{infoData?.AZURE_OPENAI_SERVICE}</Text>
-            <Label>GPT Deployment Name</Label><Text>{infoData?.AZURE_OPENAI_CHATGPT_DEPLOYMENT}</Text>
-            <Label>GPT Model Name</Label><Text>{infoData?.AZURE_OPENAI_MODEL_NAME}</Text>
-            <Label>GPT Model Version</Label><Text>{infoData?.AZURE_OPENAI_MODEL_VERSION}</Text>
+            <Label>Instanca</Label><Text>{infoData?.AZURE_OPENAI_SERVICE}</Text>
+            <Label>Naziv GPT implementacije</Label><Text>{infoData?.AZURE_OPENAI_CHATGPT_DEPLOYMENT}</Text>
+            <Label>Naziv GPT modela</Label><Text>{infoData?.AZURE_OPENAI_MODEL_NAME}</Text>
+            <Label>Verzija GPT modela</Label><Text>{infoData?.AZURE_OPENAI_MODEL_VERSION}</Text>
             {infoData?.USE_AZURE_OPENAI_EMBEDDINGS ? (
             <div>
             <Label>Embeddings Deployment Name</Label><Text>{infoData?.EMBEDDINGS_DEPLOYMENT}</Text>
@@ -47,15 +47,15 @@ export const InfoContent = ({ className }: Props) => {
             </div>
             ) : (
             <div>
-            <Separator>Open Source Embeddings</Separator>
-            <Label>Embeddings Model</Label><Text>{infoData?.EMBEDDINGS_DEPLOYMENT}</Text>
+            <Separator>Ugrađeni modeli</Separator>
+            <Label>Ugrađeni modeli</Label><Text>{infoData?.EMBEDDINGS_DEPLOYMENT}</Text>
             </div>
             )}
-            <Separator>Azure AI Search</Separator>
-            <Label>Service Name</Label><Text>{infoData?.AZURE_SEARCH_SERVICE}</Text>
-            <Label>Index Name</Label><Text>{infoData?.AZURE_SEARCH_INDEX}</Text>
-            <Separator>System Configuration</Separator>
-            <Label>System Language</Label><Text>{infoData?.TARGET_LANGUAGE}</Text>
+            <Separator>Azure AI pretraga</Separator>
+            <Label>Naziv usluge</Label><Text>{infoData?.AZURE_SEARCH_SERVICE}</Text>
+            <Label>Naziv indkesa</Label><Text>{infoData?.AZURE_SEARCH_INDEX}</Text>
+            <Separator>Konfiguracija</Separator>
+            <Label>Jezik sustava</Label><Text>{infoData?.TARGET_LANGUAGE}</Text>
         </div>
     );
 };

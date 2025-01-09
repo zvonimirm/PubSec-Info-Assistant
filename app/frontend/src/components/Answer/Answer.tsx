@@ -2,6 +2,15 @@
 // Licensed under the MIT license.
 
 import { useMemo } from "react";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
+import { saveAs } from "file-saver";
+
+// Add this declaration to extend the Window interface
+declare global {
+    interface Window {
+        showSaveFilePicker: (options: any) => Promise<any>;
+    }
+}
 import { Stack, IconButton } from "@fluentui/react";
 import { ShieldCheckmark20Regular } from '@fluentui/react-icons';
 
@@ -56,7 +65,84 @@ export const Answer = ({
     setError
 }: Props) => {
     const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, answer.approach, answer.work_citation_lookup, answer.web_citation_lookup, answer.thought_chain, onCitationClicked), [answer]);
+    
+    const getParagraphsFromHtml = (html: string) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const paragraphs = Array.from(doc.body.getElementsByTagName("p")).map(p => new Paragraph(p.textContent || ""));
+        return paragraphs;
+    }
 
+    const getFirstNCitattiLines = (answerHtml: string, keyword: string = "CITATI"): string[] => {
+        // Razdvajamo tekst na linije
+        const lines = answerHtml.split("\n");
+      
+        // Tražimo liniju u kojoj prvi put pojavi ključna riječ "CITATI"
+        const index = lines.findIndex(line => line.toLowerCase().includes(keyword.toLowerCase()));
+      
+        // Ako ključna riječ nije pronađena, vratit ćemo sve linije
+        if (index === -1) {
+          return lines;
+        }
+      
+        // Vraćamo prvih n linija, uključujući liniju u kojoj je pronađena ključna riječ
+        return lines.slice(0, index);
+      }; 
+
+
+    const onDownloadClick = async (answerHtml: string) => {
+      
+ 
+     // Split the text into lines
+     const lines = getFirstNCitattiLines(answerHtml, "CITATI SLIČNIH SLUČAJEVA");
+ 
+     // Function to process each line and generate paragraphs
+     const paragraphs = lines.map((line, index) => {
+       // Check if the line is a heading
+       if (line.startsWith("#")) {
+         return new Paragraph({
+           text: line.slice(1).trim(), // Remove the '#' symbol for heading text
+           heading: HeadingLevel.HEADING_1,
+         });
+       }
+       
+       // Check if the line is a bold paragraph
+       if (line.startsWith("**") && line.endsWith("**")) {
+         return new Paragraph({
+           children: [
+             new TextRun({
+               text: line.slice(2, -2), // Remove the '**' symbols around the text
+               bold: true,
+               size: 24, // Set font size (24 half-points = 12 points)
+             }),
+           ],
+           alignment: "center", // Set alignment (e.g., "center", "left", "right", "justify")
+         });
+       }
+ 
+       // Handle normal paragraph
+       return new Paragraph(line.trim());
+     });
+
+       const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: paragraphs,
+          },
+        ],
+      });
+
+   
+  
+      // Generate the document and download it
+    Packer.toBlob(doc).then((blob) => {
+        saveAs(blob, "Prijedlog odluke-TEST.docx");
+        console.log("Prijedlog odluke uspješno preuzet");
+      });
+    
+
+    };
     return (
         <Stack className={`${(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary) ? styles.answerContainerWork : 
                             answer.approach == Approaches.ChatWebRetrieveRead ? styles.answerContainerWeb :
@@ -129,6 +215,9 @@ export const Answer = ({
             {((parsedAnswer.approach == Approaches.ReadRetrieveRead || parsedAnswer.approach == Approaches.DocumentSummary) && !!parsedAnswer.work_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+                        <div className={styles.downloadFile} onClick={() => onDownloadClick(parsedAnswer.answerHtml)}> Preuzmite prijedlog odluke </div>
+                    </Stack>
+                    <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>Citati:</span>
                         {parsedAnswer.work_citations.map((x, i) => {
                             const path = getCitationFilePath(x);
@@ -141,6 +230,7 @@ export const Answer = ({
                         })}
                     </Stack>
                 </Stack.Item>
+               
             )}
             {parsedAnswer.approach == Approaches.CompareWebWithWork && (
                 <div>

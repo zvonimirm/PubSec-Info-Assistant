@@ -622,12 +622,12 @@ const Chat = () => {
                 )}
 
                 <Panel
-                    headerText="Configure answer generation"
+                    headerText="Postavke generiranja odgovora"
                     isOpen={isConfigPanelOpen}
                     isBlocking={false}
                     onDismiss={() => setIsConfigPanelOpen(false)}
                     closeButtonAriaLabel="Close"
-                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
+                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Zatvori</DefaultButton>}
                     isFooterAtBottom={true}
                 >
                     {activeChatMode == ChatMode.WorkPlusWeb &&
@@ -643,7 +643,7 @@ const Chat = () => {
                     {activeChatMode != ChatMode.Ungrounded &&
                         <SpinButton
                             className={styles.chatSettingsSeparator}
-                            label="Retrieve this many documents from search:"
+                            label="Dohvati ovoliko dokumenata iz pretrage:"
                             min={1}
                             max={50}
                             defaultValue={retrieveCount.toString()}
@@ -654,12 +654,12 @@ const Chat = () => {
                         <Checkbox
                             className={styles.chatSettingsSeparator}
                             checked={useSuggestFollowupQuestions}
-                            label="Suggest follow-up questions"
+                            label="Predloži dodatna pitanja"
                             onChange={onUseSuggestFollowupQuestionsChange}
                         />
                     }
-                    <TextField className={styles.chatSettingsSeparator} defaultValue={userPersona} label="User Persona" onChange={onUserPersonaChange} />
-                    <TextField className={styles.chatSettingsSeparator} defaultValue={systemPersona} label="System Persona" onChange={onSystemPersonaChange} />
+                    <TextField className={styles.chatSettingsSeparator} defaultValue={userPersona} label="Korisnička persona" onChange={onUserPersonaChange} />
+                    <TextField className={styles.chatSettingsSeparator} defaultValue={systemPersona} label="Persona sustava" onChange={onSystemPersonaChange} />
                     <ResponseLengthButtonGroup className={styles.chatSettingsSeparator} onClick={onResponseLengthChange} defaultValue={responseLength} />
                     <ResponseTempButtonGroup className={styles.chatSettingsSeparator} onClick={onResponseTempChange} defaultValue={responseTemp} />
                     {activeChatMode != ChatMode.Ungrounded &&
@@ -672,12 +672,12 @@ const Chat = () => {
                 </Panel>
 
                 <Panel
-                    headerText="Information"
+                    headerText="Informacije o aplikaciji"
                     isOpen={isInfoPanelOpen}
                     isBlocking={false}
                     onDismiss={() => setIsInfoPanelOpen(false)}
                     closeButtonAriaLabel="Close"
-                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsInfoPanelOpen(false)}>Close</DefaultButton>}
+                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsInfoPanelOpen(false)}>Zatvori</DefaultButton>}
                     isFooterAtBottom={true}                >
                     <div className={styles.resultspanel}>
                         <InfoContent />

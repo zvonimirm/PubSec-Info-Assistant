@@ -288,7 +288,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'name',
-            name: 'Name',
+            name: 'Naziv',
             fieldName: 'name',
             minWidth: 210,
             maxWidth: 350,
@@ -302,7 +302,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'state',
-            name: 'State',
+            name: 'Status',
             fieldName: 'state',
             minWidth: 70,
             maxWidth: 90,
@@ -321,7 +321,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'fileFolder',
-            name: 'Folder',
+            name: 'Mapa',
             fieldName: 'fileFolder',
             minWidth: 70,
             maxWidth: 90,
@@ -332,7 +332,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'tags',
-            name: 'Tags',
+            name: 'Oznake',
             fieldName: 'tags',
             minWidth: 70,
             maxWidth: 90,
@@ -345,7 +345,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'upload_timestamp',
-            name: 'Submitted On',
+            name: 'Preneseno dana',
             fieldName: 'upload_timestamp',
             minWidth: 90,
             maxWidth: 120,
@@ -361,7 +361,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'modified_timestamp',
-            name: 'Last Updated',
+            name: 'Zadnja izmjena',
             fieldName: 'modified_timestamp',
             minWidth: 90,
             maxWidth: 120,
@@ -380,7 +380,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'state_description',
-            name: 'Status Detail',
+            name: 'Status detaljno',
             fieldName: 'state_description',
             minWidth: 90,
             maxWidth: 200,
@@ -404,18 +404,18 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
             <div className={styles.buttonsContainer}>
                 <div className={`${styles.refresharea} ${styles.divSpacing}`} onClick={onRefresh} aria-label=" Refresh">
                     <ArrowClockwise24Regular className={styles.refreshicon} />
-                    <span className={`${styles.refreshtext} ${styles.centeredText}`}>Refresh</span>
+                    <span className={`${styles.refreshtext} ${styles.centeredText}`}>Osvježi</span>
                 </div>        
                 <div className={`${styles.refresharea} ${styles.divSpacing}`} onClick={handleDeleteClick} aria-label=" Delete">
                     <Delete24Regular className={styles.refreshicon} />
-                    <span className={`${styles.refreshtext} ${styles.centeredText}`}>Delete</span>
+                    <span className={`${styles.refreshtext} ${styles.centeredText}`}>Izbriši</span>
                 </div>
                 <div className={`${styles.refresharea} ${styles.divSpacing}`} onClick={handleResubmitClick} aria-label=" Resubmit">
                     <Send24Regular className={styles.refreshicon} />
-                    <span className={`${styles.refreshtext} ${styles.centeredText}`}>Resubmit</span>
+                    <span className={`${styles.refreshtext} ${styles.centeredText}`}>Ponovno pošalji</span>
                 </div>
             </div>
-            <span className={styles.footer}>{"(" + items.length as string + ") records."}</span>
+            <span className={styles.footer}>{"(" + items.length as string + ") zapisa."}</span>
             <DetailsList
                 items={itemList}
                 compact={true}
@@ -428,7 +428,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
                 isHeaderVisible={true}
                 onItemInvoked={onItemInvoked}
             />
-            <span className={styles.footer}>{"(" + items.length as string + ") records."}</span>
+            <span className={styles.footer}>{"(" + items.length as string + ") zapisa."}</span>
             {/* <Button text="Delete" onClick={handleDeleteClick} style={{ marginRight: '10px' }} />
             <Button text="Resubmit" onClick={handleResubmitClick} /> */}
             {/* Dialog for delete confirmation */}
@@ -437,8 +437,8 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
                 onDismiss={() => setIsDeleteDialogVisible(false)}
                 dialogContentProps={{
                     type: DialogType.normal,
-                    title: 'Delete Confirmation',
-                    subText: 'Are you sure you want to delete the selected items?'
+                    title: 'Potvrda brisanja',
+                    subText: 'Jeste li sigurni da želite obrisati odabrane dokumente?'
                 }}
                 modalProps={{
                     isBlocking: true,
@@ -446,8 +446,8 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
                 }}
             >
                 <DialogFooter>
-                    <PrimaryButton onClick={handleDelete} text="Delete" />
-                    <DefaultButton onClick={() => setIsDeleteDialogVisible(false)} text="Cancel" />
+                    <PrimaryButton onClick={handleDelete} text="Obriši" />
+                    <DefaultButton onClick={() => setIsDeleteDialogVisible(false)} text="Odustani" />
                 </DialogFooter>
             </Dialog>
             {/* Dialog for resubmit confirmation */}
@@ -456,8 +456,8 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
                 onDismiss={() => setIsResubmitDialogVisible(false)}
                 dialogContentProps={{
                     type: DialogType.normal,
-                    title: 'Resubmit Confirmation',
-                    subText: 'Are you sure you want to resubmit the selected items?'
+                    title: 'Potvrda ponovnog slanja',
+                    subText: 'Jeste li sigurni da želite ponovno poslati odabrane dokumente?'
                 }}
                 modalProps={{
                     isBlocking: true,
@@ -465,8 +465,8 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
                 }}
             >
                 <DialogFooter>
-                    <PrimaryButton onClick={handleResubmit} text="Resubmit" />
-                    <DefaultButton onClick={() => setIsResubmitDialogVisible(false)} text="Cancel" />
+                    <PrimaryButton onClick={handleResubmit} text="Ponovno pošalji" />
+                    <DefaultButton onClick={() => setIsResubmitDialogVisible(false)} text="Odustani" />
                 </DialogFooter>
             </Dialog>
             <div>
