@@ -441,7 +441,14 @@ const Chat = () => {
           setFileContent("Failed to read the document.");
           return "Failed to read the document.";
         }
-      };
+    };
+    
+    //Upload na blob storage (PoC - za kasnije integraciju s eSpisom)
+    const handleBlobStorage = async (text: string, files: any) => {
+        console.log("handleBlobStorage ", files[0].file.name);
+        await handleUpload(files);
+    
+    };
 
     // Generiraj sažetak dokumenta (todo više njih?)
     const handleSummaryClick = async (text: string, files: any) => {
@@ -449,15 +456,10 @@ const Chat = () => {
         content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
     
         let diplay_question = `Generiram sažetak dokumenta: ${files[0].file.name}`;
-        makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.GPTDirect, {}, {}, {}, diplay_question);
+        makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.DocumentSummary, {}, {}, {}, diplay_question);
+       
     };
 
-    //Upload na blob storage (PoC - za kasnije integraciju s eSpisom)
-    const handleBlobStorage = async (text: string, files: any) => {
-        console.log("handleBlobStorage ", files[0].file.name);
-        await handleUpload(files);
-    
-    };
 
     //Generiraj prijedlog odluke
     const handleDecisionProposal = async (text: string, files: any) => {
@@ -466,7 +468,7 @@ const Chat = () => {
         content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
     
         let diplay_question = `Generiram prijedlog odluke na temelju učitanog dokumenta: ${files[0].file.name} i ostalih sličnih dokumenata u sustavu`;
-        makeApiRequest(`Generiraj mi prijedlog odluke na tužbu: ${content}`, Approaches.DocumentSummary, {}, {}, {}, diplay_question);
+        makeApiRequest(`Generiraj mi prijedlog odluke na tužbu: ${content}`, Approaches.DecisionProposal, {}, {}, {}, diplay_question);
         
     };
     const handleLegalAssistantAction = (text: string, files: any) => {
@@ -481,7 +483,12 @@ const Chat = () => {
             handleDecisionProposal(text, files);
         }
     };
-
+    
+    const handleDecisionProposalClicked = (question: string, approach: Approaches, work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } }, web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } }, thought_chain: { [key: string]: string }) => {
+        let diplay_question = `Generiram prijedlog odluke na temelju učitanog dokumenta i ostalih sličnih dokumenata u sustavu`;
+        question= "Generiraj mi prijedlog odluke na tužbu: " + lastQuestionRef.current;
+        makeApiRequest(question, Approaches.DecisionProposal, work_citation_lookup, web_citation_lookup, thought_chain, diplay_question);
+    };
 
     return (
         <div className={styles.container}>
@@ -556,6 +563,7 @@ const Chat = () => {
                                             onThoughtProcessClicked={() => onToggleTab(AnalysisPanelTabs.ThoughtProcessTab, index)}
                                             onSupportingContentClicked={() => onToggleTab(AnalysisPanelTabs.SupportingContentTab, index)}
                                             onFollowupQuestionClicked={q => makeApiRequest(q, answer[1].approach, answer[1].work_citation_lookup, answer[1].web_citation_lookup, answer[1].thought_chain)}
+                                            onDecisionProposalClicked={q => handleDecisionProposalClicked(q, Approaches.DecisionProposal, answer[1].work_citation_lookup, answer[1].web_citation_lookup, answer[1].thought_chain)}
                                             showFollowupQuestions={useSuggestFollowupQuestions && answers.length - 1 === index}
                                             onAdjustClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
                                             onRegenerateClick={() => makeApiRequest(answers[index][0], answer[1].approach, answer[1].work_citation_lookup, answer[1].web_citation_lookup, answer[1].thought_chain)}

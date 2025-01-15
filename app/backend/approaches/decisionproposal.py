@@ -22,7 +22,7 @@ from core.modelhelper import get_token_limit
 import requests
 
 
-class DocumentSummary(Approach):
+class DecisionProposal(Approach):
     """Approach that uses a simple retrieve-then-read implementation, using the Azure AI Search and
     Azure OpenAI APIs directly. It first retrieves top documents from search, combines it with data from request,
     then constructs a prompt with them, and then uses Azure OpenAI to generate
@@ -61,10 +61,20 @@ class DocumentSummary(Approach):
     # """
     SYSTEM_MESSAGE_CHAT_CONVERSATION = """ Ti si Azure OpenAI Completion sistem. Tvoja persona je {systemPersona} a korisnička persona je {userPersona}.
     
-    Ulazni dokument je tužba. Želim da mi napraviš sažetak tužbe.
-    Naslov neka bude "SAŽETAK DOKUMENTA"
-    Sažetak treba bi jasan i kratak. Navedi osnovna imena i ostale ključne informacije.
-    U sažetku navedi osnovne činjenice i pravne argumente iz tužbe.
+    Ulazni dokument je tužba. U izvornim dokumentima možeš pronaći presude.
+    Generiraj mi prijedlog odluke za tužbu na temelju sličnih slučajeva iz izvornih dokumenata.
+    Prijedlog odluke mora izgledati kao postojeće odluke u izvornim dokumentima. Znači mora imati "U IME REPUBLIKE HRVATSKE RJEŠENJE", "RIJEŠIO JE" i "OBRAZLOŽENJE".
+    Format teksta mora izgledati kao prava odluka s naslovom, zaglavljem i odgovarajućim odjeljcima. Naslovi moraju biti podebljani.
+    Specifični detalji poput imena, prezimena i brojeva moraju biti preuzeti iz ulazne tužbe.
+    Imena članova vijeća ne navoditi, nego ostaviti praznu crtu za naknadni upis.
+   
+   Na kraju teksta, prije citata, treba ostaviti prostor za unos današnjeg datuma.
+
+    Navedi mi citate sličnih slučajeva. Ako nema sličnih slučajeva, dokument treba navesti da nisu pronađeni slični slučajevi.
+    Citate treba navesti na kraju dokumenta. Koristi oznake poput [File1], [File2], itd., prema njihovom redoslijedu u popisu.
+
+
+    {injected_prompt}
     """
 
 

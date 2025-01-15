@@ -118,20 +118,24 @@
 }
 
 .downloadFile {
+    margin-top: 30px;
     margin-right: 5px;
     margin-bottom: 45px;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 24px;
     border-radius: 4px;
     background: #dbdbdb;
     color: #000000;
-    font-size: 20px;
+    font-size: 17px;
     cursor: pointer;
-    padding: 5px;
+    padding-left: 14px;
+    padding-right:14px;
+    padding-top: 2px;
+    padding-bottom: 3px;
 }
 .downloadFile:hover {
     opacity: 0.8;
-    outline: 2px solid rgb(70, 70, 71);
+    outline: 2px solid rgb(144, 144, 145);
 }
 
 .citationWork {
