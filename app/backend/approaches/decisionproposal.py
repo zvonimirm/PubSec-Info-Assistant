@@ -68,7 +68,7 @@ class DecisionProposal(Approach):
     Specifični detalji poput imena, prezimena i brojeva moraju biti preuzeti iz ulazne tužbe.
     Imena članova vijeća ne navoditi, nego ostaviti praznu crtu za naknadni upis.
    
-   Na kraju teksta, prije citata, treba ostaviti prostor za unos današnjeg datuma.
+    Na kraju teksta, prije citata, ostavi mjesto za datum i potpis.
 
     Navedi mi citate sličnih slučajeva. Ako nema sličnih slučajeva, dokument treba navesti da nisu pronađeni slični slučajevi.
     Citate treba navesti na kraju dokumenta. Koristi oznake poput [File1], [File2], itd., prema njihovom redoslijedu u popisu.
