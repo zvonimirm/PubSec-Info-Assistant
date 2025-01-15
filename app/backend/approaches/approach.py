@@ -15,6 +15,7 @@ class Approaches(Enum):
     CompareWorkWithWeb = 5
     CompareWebWithWork = 6
     DocumentSummary = 7
+    DecisionProposal = 8
 
 class Approach:
     """

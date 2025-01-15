@@ -36,6 +36,7 @@ interface Props {
     onRagCompareClicked: () => void;
     onSupportingContentClicked: () => void;
     onFollowupQuestionClicked?: (question: string) => void;
+    onDecisionProposalClicked?: (answerHtml: string) => void;
     showFollowupQuestions?: boolean;
     onAdjustClick?: () => void;
     onRegenerateClick?: () => void;
@@ -56,6 +57,7 @@ export const Answer = ({
     onRagCompareClicked,
     onSupportingContentClicked,
     onFollowupQuestionClicked,
+    onDecisionProposalClicked,
     showFollowupQuestions,
     onAdjustClick,
     onRegenerateClick,
@@ -90,6 +92,8 @@ export const Answer = ({
     };
 
 
+    const onDecisionProposalClick = async (answerHtml: string) => {
+    }
     const onDownloadClick = async (answerHtml: string) => {
 
 
@@ -98,7 +102,7 @@ export const Answer = ({
 
         // Function to process each line and generate paragraphs
         const paragraphs = lines.map((line, index) => {
-            
+
             // Check if the line is a bold paragraph
             if (line.startsWith("**") && line.endsWith("**")) {
                 return new Paragraph({
@@ -107,7 +111,7 @@ export const Answer = ({
                             text: line.slice(2, -2), // Remove the '**' symbols around the text
                             bold: true,
                             size: 24, // Set font size (24 half-points = 12 points)
-                            
+
                         }),
                     ],
                     spacing: {
@@ -116,7 +120,7 @@ export const Answer = ({
                     alignment: "center", // Set alignment (e.g., "center", "left", "right", "justify")
                 });
             }
-            else{
+            else {
                 return new Paragraph({
                     children: [
                         new TextRun({
@@ -171,10 +175,10 @@ export const Answer = ({
 
 
     };
-   
+
 
     return (
-        <Stack className={`${(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary) ? styles.answerContainerWork :
+        <Stack className={`${(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary || answer.approach == Approaches.DecisionProposal) ? styles.answerContainerWork :
             answer.approach == Approaches.ChatWebRetrieveRead ? styles.answerContainerWeb :
                 answer.approach == Approaches.CompareWorkWithWeb || answer.approach == Approaches.CompareWebWithWork ? styles.answerContainerCompare :
                     answer.approach == Approaches.GPTDirect ? styles.answerContainerUngrounded :
@@ -195,7 +199,7 @@ export const Answer = ({
                                 disabled={!answer.thoughts}
                             />
                         }
-                        {(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary) &&
+                        {(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary || answer.approach == Approaches.DecisionProposal) &&
                             <IconButton
                                 style={{ color: "black" }}
                                 iconProps={{ iconName: "ClipboardList" }}
@@ -247,9 +251,25 @@ export const Answer = ({
 
             )}
 
-
+            {(parsedAnswer.approach == Approaches.DocumentSummary && !!parsedAnswer.answerHtml.length) && (
+                <Stack.Item>
+                    <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+                        <div className={styles.downloadFile} onClick={() => onDecisionProposalClicked && onDecisionProposalClicked(parsedAnswer.answerHtml)}> Generiraj prijedlog odluke</div>
+                        
+                        
+                    </Stack>
+                </Stack.Item>
+            )}
 
             {(parsedAnswer.approach == Approaches.DocumentSummary && !!parsedAnswer.work_citations.length) && (
+                <Stack.Item>
+                    <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+                        <div className={styles.downloadFile} onClick={() => onDownloadClick(parsedAnswer.answerHtml)}> Generiraj prijedlog odluke</div>
+                    </Stack>
+                </Stack.Item>
+            )}
+
+            {(parsedAnswer.approach == Approaches.DecisionProposal && !!parsedAnswer.work_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <div className={styles.downloadFile} onClick={() => onDownloadClick(parsedAnswer.answerHtml)}> Preuzmite prijedlog odluke </div>
@@ -257,7 +277,7 @@ export const Answer = ({
                 </Stack.Item>
             )}
 
-            {((parsedAnswer.approach == Approaches.ReadRetrieveRead || parsedAnswer.approach == Approaches.DocumentSummary) && !!parsedAnswer.work_citations.length) && (
+            {((parsedAnswer.approach == Approaches.ReadRetrieveRead || parsedAnswer.approach == Approaches.DocumentSummary || answer.approach == Approaches.DecisionProposal) && !!parsedAnswer.work_citations.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>Citati:</span>
