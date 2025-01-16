@@ -33,6 +33,14 @@
 .chat-overflow-hidden-body {
     overflow: hidden;
 }
+.legalEntryStyle {
+    width: 100%;
+    background: #f2f2f2;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .chatEmptyState {
     flex-grow: 1;
@@ -129,8 +137,8 @@
 }
 
 .chatInput {
-    position: sticky;
-    bottom: 0;
+    position: fixed;
+    bottom: 50px;
     flex: 0 0 100px;
     padding-top: 12px;
     padding-bottom: 24px;

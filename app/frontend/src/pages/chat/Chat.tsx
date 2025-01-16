@@ -505,40 +505,41 @@ const Chat = () => {
             {isLAEntryPointVisible && <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div>
-                        <div className={styles.chatEmptyState}>
-                            {activeChatMode == ChatMode.WorkOnly ? 
-                                <div>
-                                    <div className={styles.chatEmptyStateHeader}> 
-                                        <BuildingMultipleFilled fontSize={"100px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work Data logo" />
+                            <div className={styles.chatEmptyState}>
+                                {activeChatMode == ChatMode.WorkOnly ? 
+                                    <div>
+                                        <div className={styles.chatEmptyStateHeader}> 
+                                            <BuildingMultipleFilled fontSize={"100px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work Data logo" />
+                                            </div>
+                                        <h1 className={styles.chatEmptyStateTitle}>Pitajte informacije o odlukama VSRH</h1>
+                                    </div>
+                                : activeChatMode == ChatMode.WorkPlusWeb ?
+                                    <div>
+                                        <div className={styles.chatEmptyStateHeader}> 
+                                            <BuildingMultipleFilled fontSize={"80px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work and Web Data logo" /><AddFilled fontSize={"50px"} primaryFill={"rgba(0, 0, 0, 0.7)"} aria-hidden="true" aria-label=""/><GlobeFilled fontSize={"80px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="" />
                                         </div>
-                                    <h1 className={styles.chatEmptyStateTitle}>Pitajte informacije o odlukama VSRH</h1>
-                                </div>
-                            : activeChatMode == ChatMode.WorkPlusWeb ?
-                                <div>
-                                    <div className={styles.chatEmptyStateHeader}> 
-                                        <BuildingMultipleFilled fontSize={"80px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work and Web Data logo" /><AddFilled fontSize={"50px"} primaryFill={"rgba(0, 0, 0, 0.7)"} aria-hidden="true" aria-label=""/><GlobeFilled fontSize={"80px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="" />
+                                        <h1 className={styles.chatEmptyStateTitle}>Chat with your work and web data</h1>
                                     </div>
-                                    <h1 className={styles.chatEmptyStateTitle}>Chat with your work and web data</h1>
-                                </div>
-                            : //else Ungrounded
-                                <div>
-                                    <div className={styles.chatEmptyStateHeader}> 
-                                        <ChatSparkleFilled fontSize={"80px"} primaryFill={"rgba(0, 0, 0, 0.35)"} aria-hidden="true" aria-label="Chat logo" />
+                                : //else Ungrounded
+                                    <div>
+                                        <div className={styles.chatEmptyStateHeader}> 
+                                            <ChatSparkleFilled fontSize={"80px"} primaryFill={"rgba(0, 0, 0, 0.35)"} aria-hidden="true" aria-label="Chat logo" />
+                                        </div>
+                                        <h1 className={styles.chatEmptyStateTitle}>Chat directly with a LLM</h1>
                                     </div>
-                                    <h1 className={styles.chatEmptyStateTitle}>Chat directly with a LLM</h1>
-                                </div>
-                            }
-                            <span className={styles.chatEmptyObjectives}>
-                                <i>Legal AI koristi umjetnu inteligenciju.   </i>
-                            </span>
-                            {activeChatMode != ChatMode.Ungrounded &&
-                                <div>
-                                    <h2 className={styles.chatEmptyStateSubtitle}>Postavite pitanje ili probajte primjere</h2>
-                                    <ExampleList onExampleClicked={onExampleClicked} />
-                                </div>
-                            }
-                        </div>
-                        <div>
+                                }
+                                <span className={styles.chatEmptyObjectives}>
+                                    <i>Legal AI koristi umjetnu inteligenciju.   </i>
+                                </span>
+                                {activeChatMode != ChatMode.Ungrounded &&
+                                    <div>
+                                        <h2 className={styles.chatEmptyStateSubtitle}>Postavite pitanje ili probajte primjere</h2>
+                                        <ExampleList onExampleClicked={onExampleClicked} />
+                                    </div>
+                                }
+                                
+                            </div>
+                        <div className={styles.legalEntryStyle}>
                            <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantEntryClick}/>
                         </div>
                         </div>
