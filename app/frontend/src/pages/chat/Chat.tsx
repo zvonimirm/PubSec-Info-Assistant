@@ -672,7 +672,7 @@ const Chat = () => {
                     <ResponseTempButtonGroup className={styles.chatSettingsSeparator} onClick={onResponseTempChange} defaultValue={responseTemp} />
                     {activeChatMode != ChatMode.Ungrounded &&
                         <div>
-                            <Separator className={styles.chatSettingsSeparator}>Filter Search Results by</Separator>
+                            <Separator className={styles.chatSettingsSeparator}>Filtriraj rezultate po:</Separator>
                             <FolderPicker allowFolderCreation={false} onSelectedKeyChange={onSelectedKeyChanged} preSelectedKeys={selectedFolders} />
                             <TagPickerInline allowNewTags={false} onSelectedTagsChange={onSelectedTagsChange} preSelectedTags={selectedTags} />
                         </div>
