@@ -77,7 +77,7 @@ const Chat = () => {
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
     const [isLAEntryPointVisible, setAssistentEntryPointVisible] = useState(true);
-    const [fileText, setFileText] = useState<string[]>([]);
+    const [fileHtmlDisplay, setFileHtmlDisplay] = useState("");
 
     async function fetchFeatureFlags() {
         try {
@@ -435,6 +435,13 @@ const Chat = () => {
         try {
           const arrayBuffer = await file.arrayBuffer(); // Read file as ArrayBuffer
           const result = await mammoth.extractRawText({ arrayBuffer });
+
+          mammoth
+            .convertToHtml({ arrayBuffer })
+            .then((result) => setFileHtmlDisplay(result.value))
+            .catch((err) => console.error("Error converting file:", err));
+
+
           return result.value;
         } catch (error) {
           console.error("Error reading .docx file:", error);
@@ -624,9 +631,10 @@ const Chat = () => {
                         sourceFile={activeCitationSourceFile}
                         pageNumber={activeCitationSourceFilePageNumber}
                         onActiveTabChanged={x => onToggleTab(x, selectedAnswer)}
-                        citationHeight="760px"
+                        citationHeight="850px"
                         answer={answers[selectedAnswer][1]}
                         activeTab={activeAnalysisPanelTab}
+                        izvorniDokument={fileHtmlDisplay}
                     />
                 )}
 

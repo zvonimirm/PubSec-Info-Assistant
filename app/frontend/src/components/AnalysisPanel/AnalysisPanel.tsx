@@ -24,6 +24,7 @@ interface Props {
     pageNumber: string | undefined;
     citationHeight: string;
     answer: ChatResponse;
+    izvorniDokument?: any;
 }
 
 const pivotItemDisabledStyle: React.CSSProperties = {
@@ -31,7 +32,7 @@ const pivotItemDisabledStyle: React.CSSProperties = {
     
 };
 
-export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, pageNumber, citationHeight, className, onActiveTabChanged }: Props) => {
+export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, pageNumber, citationHeight, className, onActiveTabChanged, izvorniDokument }: Props) => {
     
     const [innerPivotTab, setInnerPivotTab] = useState<string>('indexedFile');
     const [activeCitationObj, setActiveCitationObj] = useState<ActiveCitation>();
@@ -49,6 +50,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
 
     const tooltipRef2 = React.useRef<ITooltipHost>(null);
     const tooltipRef3 = React.useRef<ITooltipHost>(null);
+    const [htmlContent, setHtmlContent] = useState(izvorniDokument);
     
     const onRenderItemLink = (content: string | JSX.Element | JSX.Element[] | undefined, tooltipRef: IRefObject<ITooltipHost> | undefined, shouldRender: boolean) => (properties: IPivotItemProps | undefined,
         nullableDefaultRenderer?: (props: IPivotItemProps) => JSX.Element | null) => {
@@ -89,6 +91,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
         return sourceFileUrl;
     }
 
+   
     async function fetchActiveCitationObj() {
         try {
             const citationObj = await getCitationObj(activeCitation as string);
@@ -153,6 +156,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
         fetchSourceFileBlob();
         
     }, [activeCitation]);
+    
 
     return (
         <Pivot
@@ -204,7 +208,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                 }}>
                     <PivotItem itemKey="indexedFile" headerText="Odjeljak dokumenta">
                         {activeCitationObj === undefined ? (
-                            <Text>Loading...</Text>
+                            <Text>Učitavanje...</Text>
                         ) : 
                         (
                             <div>
@@ -222,7 +226,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                     </PivotItem>
                     <PivotItem itemKey="rawFile" headerText="Dokument">
                         {getCitationURL() === '' ? (
-                            <Text>Loading...</Text>
+                            <Text>Učitavanje...</Text>
                         ) : ["docx", "xlsx", "pptx"].includes(sourceFileExt) ? (
                             // Treat other Office formats like "xlsx" for the Office Online Viewer
                             <iframe title="Source File" src={'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(getCitationURL()) + "&action=embedview&wdStartOn=" + pageNumber} width="100%" height={citationHeight} />
@@ -239,6 +243,9 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                             // Default to iframe for other file types
                             <iframe title="Source File" src={getCitationURL()} width="100%" height={citationHeight} />
                         )}
+                    </PivotItem>
+                    <PivotItem itemKey="izvorniDokument" headerText="Izvorni Dokument">
+                        <iframe title="Izvorni dokument" srcDoc={htmlContent} style={{ backgroundColor: 'white' }} width="100%" height={citationHeight} />
                     </PivotItem>
                 </Pivot>
             </PivotItem>
