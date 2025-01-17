@@ -1,12 +1,13 @@
 
 .wrap{
-    padding-top: 480px;
-    padding-bottom: 50px;
+    padding-top: 50px;
+    padding-bottom: 10px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     flex-direction: column;
     align-items: center;
+    width: 400px;
 }
 .legalAssistantEntry{
     word-break: break-word;
