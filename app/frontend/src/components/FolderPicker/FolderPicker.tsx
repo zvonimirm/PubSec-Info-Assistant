@@ -21,6 +21,7 @@ import { IButtonProps } from '@fluentui/react/lib/Button';
 
 import { getFolders } from "../../api";
 import styles from "./FolderPicker.module.css";
+import { t } from "i18next";
 
 var allowNewFolders = false;
 
@@ -182,12 +183,12 @@ export const FolderPicker = ({allowFolderCreation, onSelectedKeyChange, preSelec
                 <ComboBox
                     multiSelect={allowNewFolders? false : true}
                     selectedKey={selectedKeys}
-                    label={allowNewFolders? "Odabir mape" : "Odabir mape (Višestruki odabir mapa)"}
+                    label={allowNewFolders? t("FolderPicker.OdabirMape") : t("FolderPicker.OdabirMapeMultiple")}
                     options={options}
                     onChange={onChange}
                     styles={comboBoxStyles}
                 />
-                <TooltipHost content={allowNewFolders ? "Odaberite mapu za prijenos dokumenata" : "Odaberite mapu po kojoj će se filtrirati pretraga"}
+                <TooltipHost content={allowNewFolders ? t("FolderPicker.TargetDirectory") : t("FolderPicker.TargetDirectoryMultiple")}
                         styles={hostStyles}
                         id={tooltipId}>
                     <Info16Regular></Info16Regular>
@@ -200,19 +201,19 @@ export const FolderPicker = ({allowFolderCreation, onSelectedKeyChange, preSelec
                         allowDisabledFocus
                         onClick={toggleTeachingBubbleVisible}
                         id={buttonId}>
-                        Kreiraj novu mapu
+                        t("FolderPicker.NewDirectory")
                     </ActionButton>
                     {teachingBubbleVisible && (
                         <TeachingBubble
                         target={`#${buttonId}`}
                         primaryButtonProps={examplePrimaryButtonProps}
                         onDismiss={toggleTeachingBubbleVisible}
-                        headline="Kreiraj novu mapu"
+                        headline={t("FolderPicker.NewDirectory")}
                         calloutProps={{ directionalHint: DirectionalHint.topCenter }}
                         styles={teachingBubbleStyles}
                         hasCloseButton={true}
                         >
-                        <TextField id={textFieldId} label='Naziv mape:' required={true} styles={getStyles}/>
+                        <TextField id={textFieldId} label={t("FolderPicker.DirectoryName")} required={true} styles={getStyles}/>
                         </TeachingBubble>
                     )}
                 </div>) : ""}

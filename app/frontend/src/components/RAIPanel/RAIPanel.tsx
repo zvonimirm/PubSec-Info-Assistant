@@ -6,6 +6,7 @@ import { Options16Filled, ArrowSync16Filled, Briefcase16Filled, Globe16Filled, B
 import styles from "./RAIPanel.module.css";
 import { Icon } from "@fluentui/react";
 import { Approaches, ChatMode } from "../../api";
+import { useTranslation } from "react-i18next";
 
 interface Props {
     approach?: Approaches;
@@ -19,15 +20,17 @@ interface Props {
 }
 
 export const RAIPanel = ({approach, chatMode, onAdjustClick, onRegenerateClick, onWebSearchClicked, onRagSearchClicked, onWebCompareClicked, onRagCompareClicked }: Props) => {
+    const { t } = useTranslation();
+    
     return (
         <div className={styles.adjustInputContainer}>
             <div className={styles.adjustInput} onClick={onAdjustClick}>
                 <Options16Filled primaryFill="rgba(133, 133, 133, 1)" />
-                <span className={styles.adjustInputText}>Prilagodi</span>
+                <span className={styles.adjustInputText}>{t('Prilagodi')}</span>
             </div>
             <div className={styles.adjustInput} onClick={onRegenerateClick}>
                 <ArrowSync16Filled primaryFill="rgba(133, 133, 133, 1)" />
-                <span className={styles.adjustInputText}>Ponovo odgovori</span>
+                <span className={styles.adjustInputText}>{t('RAIPanel.PonovoOdgovori')}</span>
             </div>
             {(approach == Approaches.ChatWebRetrieveRead && chatMode == ChatMode.WorkPlusWeb) &&
                     <>

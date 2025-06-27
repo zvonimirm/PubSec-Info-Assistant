@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { getLanguage } from "@fluentui/react";
 import { ChatResponse, 
     ChatRequest, 
     AllFilesUploadStatus, 
@@ -18,6 +19,8 @@ import { ChatResponse,
     getMaxCSVFileSizeType,
     FetchCitationFileResponse,
     } from "./models";
+
+
 
 export async function chatApi(options: ChatRequest, signal: AbortSignal): Promise<Response> {
     const response = await fetch("/chat", {
@@ -45,7 +48,8 @@ export async function chatApi(options: ChatRequest, signal: AbortSignal): Promis
                 response_length: options.overrides?.responseLength,
                 response_temp: options.overrides?.responseTemp,
                 selected_folders: options.overrides?.selectedFolders,
-                selected_tags: options.overrides?.selectedTags
+                selected_tags: options.overrides?.selectedTags,
+                language: options.overrides?.language
             },
             citation_lookup: options.citation_lookup,
             thought_chain: options.thought_chain
@@ -473,6 +477,7 @@ export async function getFeatureFlags(): Promise<GetFeatureFlagsResponse> {
 }
 
 export async function fetchCitationFile(filePath: string) : Promise<FetchCitationFileResponse> {
+    console.log("api.ts - fetchCitationFile - ", filePath);
     const response = await fetch('/get-file', {
         method: 'POST',
         headers: {
@@ -480,7 +485,53 @@ export async function fetchCitationFile(filePath: string) : Promise<FetchCitatio
         },
         body: JSON.stringify({ path: filePath }),
     });
+    console.log("response.status", response.status);
+    if (response.status > 299 || !response.ok) {
+        console.log(response);
+        throw Error('Failed to fetch file' + response.statusText);
+    }
+    const fileResponse : FetchCitationFileResponse = {file_blob : await response.blob()};
+    return fileResponse;
+}
 
+export async function translateText(
+    text: string, 
+    sourceLanguage: string, 
+    targetLanguage: string) : Promise<string> {
+    
+    console.log("api.ts - translateText -", sourceLanguage, targetLanguage);
+    const response = await fetch(`/translate_text`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            text: text,
+            source_language: sourceLanguage,
+            target_language: targetLanguage
+        })
+    });
+    console.log("response.status", response.status);
+    if (response.status > 299 || !response.ok) {
+        console.log(response);
+        throw Error('Failed to fetch file' + response.statusText);
+    }
+    const data = await response.json(); // Parse response as JSON
+    return data.translatedText;
+}
+
+
+
+export async function fetchTranslatedFile(filePath: string) : Promise<FetchCitationFileResponse> {
+    console.log("api.ts - fetchTranslatedFile -", filePath);
+    
+    const response = await fetch(`/translate-pdf?file_path=${encodeURIComponent(filePath)}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    console.log("response.status", response.status);
     if (response.status > 299 || !response.ok) {
         console.log(response);
         throw Error('Failed to fetch file' + response.statusText);

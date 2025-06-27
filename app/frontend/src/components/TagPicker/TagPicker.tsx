@@ -8,6 +8,7 @@ import { Info16Regular } from '@fluentui/react-icons';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 import { useId } from '@fluentui/react-hooks';
 import { getAllTags } from "../../api";
+import { t } from "i18next";
 
 import styles from "./TagPicker.module.css";
 
@@ -129,7 +130,7 @@ export const TagPickerInline = ({allowNewTags, onSelectedTagsChange, preSelected
       <div  className={hide? styles.hide : styles.tagArea}>
         <div className={styles.tagSelection}>
           <div className={allowAddNew ? styles.rootClass : styles.rootClassFilter}>
-            <label htmlFor={pickerId}>Oznake</label>
+            <label htmlFor={pickerId}>{t("TagPicker.Tags")}</label>
             <TagPicker
                 className={styles.tagPicker}
                 removeButtonAriaLabel="Remove"
@@ -149,7 +150,7 @@ export const TagPickerInline = ({allowNewTags, onSelectedTagsChange, preSelected
                 onChange={onChange}
             />
           </div>
-          <TooltipHost content={allowAddNew ? "Oznake koje će se pridužiti svakom dokumentu" : "Oznake po kojima se filtriraju dokumenti"}
+          <TooltipHost content={allowAddNew ? t("TagPicker.TagsPerDocument") : t("TagPicker.TagsFilterDocument")}
                     styles={hostStyles}
                     id={tooltipId}>
             <Info16Regular></Info16Regular>

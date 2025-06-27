@@ -11,13 +11,13 @@ import { TagPickerInline } from "../../components/TagPicker/TagPicker"
 import { FolderPicker } from '../../components/FolderPicker/FolderPicker';
 import { SparkleFilled, DocumentPdfFilled, DocumentDataFilled, GlobePersonFilled, MailFilled, StoreMicrosoftFilled } from "@fluentui/react-icons";
 import styles from "./Content.module.css";
-
+import { useTranslation } from "react-i18next";
 export interface IButtonExampleProps {
     disabled?: boolean;
     checked?: boolean;
   }
-
 const Content = () => {
+    const { t } = useTranslation();
     const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined);
     const [selectedTags, setSelectedTags] = useState<string[] | undefined>(undefined);
     const [selectedApproach, setSelectedApproach] = useState<number | undefined>(undefined);
@@ -42,32 +42,32 @@ const Content = () => {
     return (
         <div className={styles.contentArea} >
             <Pivot aria-label="Upload Files Section" className={styles.topPivot} onLinkClick={handleLinkClick}>
-                <PivotItem headerText="Učitaj datoteke" aria-label="Upload Files Tab">
+                <PivotItem headerText={t("Content.HeaderText")} aria-label="Upload Files Tab">
                     <div className={styles.App} >
                         <div style={{ marginBottom: '20px', marginTop: '20px' }}>
                             <SparkleFilled fontSize={"60px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Supported File Types" />
-                            <h1 className={styles.EmptyStateTitle}>Podržani tipovi datoteka</h1>
+                            <h1 className={styles.EmptyStateTitle}>{t("Content.DocumentTypeSupportTitle")}</h1>
                             <span className={styles.EmptyObjectives}>
-                                Informacijski pomoćnik trenutno podržava sljedeće tipove datoteka:
+                                {t("Content.DocumentTypeSupportObjectives")}
                             </span>
                             <span className={styles.EmptyObjectivesList}>
                                 <span className={styles.EmptyObjectivesListItem}>
                                     <DocumentDataFilled fontSize={"40px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Data" />
-                                    <span className={styles.EmptyObjectivesListItemText}><b>Podaci</b><br />
+                                    <span className={styles.EmptyObjectivesListItemText}><b>{t("Content.Data")}</b><br />
                                         xml, json, csv, tsv, txt
                                     </span>
                                 </span>
                                 <span className={styles.EmptyObjectivesListItem}>
                                     <StoreMicrosoftFilled fontSize={"40px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Microsoft 365" />
-                                    <span className={styles.EmptyObjectivesListItemText}><b>Alati za produktivnost</b><br />
+                                    <span className={styles.EmptyObjectivesListItemText}><b>{t("Content.ProductivitySoftware")}</b><br />
                                         pptx, docx & xlsx
                                     </span>
                                 </span>
                                 <span className={styles.EmptyObjectivesListItem}>
                                     <DocumentPdfFilled fontSize={"40px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="PDF" />
                                     <span className={styles.EmptyObjectivesListItemText}><b>PDF</b><br />
-                                    Za maksimalan broj stranica provjerite <a href="https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/concept-layout?view=doc-intel-4.0.0#input-requirements">
-                                    dokumentaciju</a> 
+                                    {t("Content.MaxNoPages1")} <a href="https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/concept-layout?view=doc-intel-4.0.0#input-requirements">
+                                    {t("Content.MaxNoPages2")}</a> 
                                     </span>
                                 </span>
                                 <span className={styles.EmptyObjectivesListItem}>
@@ -78,7 +78,7 @@ const Content = () => {
                                 </span>
                                 <span className={styles.EmptyObjectivesListItem}>
                                     <MailFilled fontSize={"40px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Email" />
-                                    <span className={styles.EmptyObjectivesListItemText}><b>E-pošta</b><br />
+                                    <span className={styles.EmptyObjectivesListItemText}><b>{t("Content.Email")}</b><br />
                                         eml & msg
                                     </span>
                                 </span>
@@ -91,7 +91,7 @@ const Content = () => {
                         </div>
                     </div>
                 </PivotItem>
-                <PivotItem headerText="Status učitavanja" aria-label="Upload Status Tab">
+                <PivotItem headerText={t("Content.UploadStatus")}aria-label="Upload Status Tab">
                     <FileStatus className=""/>
                 </PivotItem>
             </Pivot>

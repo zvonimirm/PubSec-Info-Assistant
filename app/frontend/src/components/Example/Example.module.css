@@ -22,16 +22,22 @@
     cursor: pointer;
 }
 
+/* @media (max-width: 1050px) {
+    .example {
+        background: blue;
+    }
+} */
+
 .example:hover {
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
-    outline: 2px solid rgba(115, 118, 225, 1);
+    outline: 2px solid #0066CC;
 }
 
 .exampleText {
     margin: 0;
     font-size: 21px;
     width: 280px;
-    height: 90px;
+    height: 120px;
 }
 
 @media only screen and (max-height: 780px) {

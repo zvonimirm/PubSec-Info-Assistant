@@ -2,17 +2,21 @@
 // Licensed under the MIT license.
 
 import { Outlet, NavLink, Link } from "react-router-dom";
-import openai from "../../assets/openai.svg";
+import openai from "../../assets/asee-logo.svg";
 import legalAssistant from "../../assets/icon-legal-ai.webp";
 import { WarningBanner } from "../../components/WarningBanner/WarningBanner";
 import styles from "./Layout.module.css";
 import { Title } from "../../components/Title/Title";
 import { getFeatureFlags, GetFeatureFlagsResponse } from "../../api";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useHeader } from "../../components/HeaderProvider";
+
 
 export const Layout = () => {
+    const { showHeader } = useHeader();
     const [featureFlags, setFeatureFlags] = useState<GetFeatureFlagsResponse | null>(null);
-
+    
     async function fetchFeatureFlags() {
         try {
             const fetchedFeatureFlags = await getFeatureFlags();
@@ -22,30 +26,33 @@ export const Layout = () => {
             console.log(error);
         }
     }
-
+    
+    const { t } = useTranslation();
     useEffect(() => {
         fetchFeatureFlags();
     }, []);
 
     return (
+        
         <div className={styles.layout}>
-            <header className={styles.header} role={"banner"}>
+            <>
+            {showHeader && <header className={styles.header} role={"banner"}>
                 <WarningBanner />
                 <div className={styles.headerContainer}>
                     <div className={styles.headerTitleContainer}>
                         <img src={openai} alt="Azure OpenAI" className={styles.headerLogo} />
-                        <h3 className={styles.headerTitle}><Title /></h3>
+                        <h3 className={styles.headerTitle}>Finley</h3>
                     </div>
                     <nav>
                         <ul className={styles.headerNavList}>
                             <li>
                                 <NavLink to="/" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
-                                    Razgovor
+                                    {t('Layout.Razgovor')}
                                 </NavLink>
                             </li>
                             <li className={styles.headerNavLeftMargin}>
                                 <NavLink to="/content" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
-                                    Upravljanje sadržajem
+                                    {t("Layout.Sadrzaj")}
                                 </NavLink>
                             </li>
                             {featureFlags?.ENABLE_MATH_ASSISTANT &&
@@ -71,13 +78,14 @@ export const Layout = () => {
                     </ul>
                     </nav>
                 </div>
-            </header>
+            </header>}
 
             <Outlet />
 
             <footer>
                 <WarningBanner />
             </footer>
+        </>
         </div>
     );
 };

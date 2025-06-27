@@ -98,6 +98,7 @@
 .chatEmptyStateSubtitle {
     font-weight: 600;
     margin-bottom: 10px;
+    margin-top: 50px;
 }
 
 @media only screen and (max-height: 780px) {
@@ -122,6 +123,7 @@
     flex-direction: column;
     overflow-y: auto; /* or 'scroll' if you always want the scrollbar to be visible */
     max-height: calc(100vh - 313px); /* optional, adjust according to your layout */
+    background-color: #f2f2f2;
 }
 
 .chatMessageGpt {
@@ -136,7 +138,8 @@
     margin-bottom: 20px;
 }
 
-.chatInput {
+.introductionChatStyle
+{
     position: fixed;
     bottom: 50px;
     flex: 0 0 100px;
@@ -148,7 +151,23 @@
     max-width: 1028px;
     background: #f2f2f2;
 }
+.chatInput {
+    position: fixed;
+    bottom: 50px;
+    flex: 0 0 100px;
+    padding-top: 12px;
+    padding-bottom: 8px;
+    padding-left: 8px;
+    padding-right: 24px;
+    width: calc(100% - 50vw);
+    max-width: 1028px;
+    background: #f2f2f2;
+}
 
+.iconStyle{
+    height: 90px;
+    width: 90px;
+}
 .chatAnalysisPanel {
     flex: 1;
     overflow-y: auto;

@@ -10,36 +10,12 @@ import { animated, useSpring } from "@react-spring/web";
 import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState, getFolders, getTags } from "../../api";
 
 import styles from "./FileStatus.module.css";
-
+import { useTranslation } from "react-i18next";
 const dropdownTimespanStyles: Partial<IDropdownStyles> = { dropdown: { width: 150 } };
 const dropdownFileStateStyles: Partial<IDropdownStyles> = { dropdown: { width: 200 } };
 const dropdownFolderStyles: Partial<IDropdownStyles> = { dropdown: { width: 200 } };
 const dropdownTagStyles: Partial<IDropdownStyles> = { dropdown: { width: 200 } };
 
-const dropdownTimespanOptions = [
-    { key: 'Time Range', text: 'Kraj vremenskog perioda', itemType: DropdownMenuItemType.Header },
-    { key: '4hours', text: '4 sata' },
-    { key: '12hours', text: '12 sati' },
-    { key: '24hours', text: '24 sata' },
-    { key: '7days', text: '7 dana' },
-    { key: '30days', text: '30 dana' },
-    { key: '-1days', text: 'Cijeli period' },
-  ];
-
-const dropdownFileStateOptions = [
-    { key: 'FileStates', text: 'Status dokumenta', itemType: DropdownMenuItemType.Header },
-    { key: FileState.All, text: 'Svi' },
-    { key: FileState.Complete, text: 'Završeno' },
-    { key: FileState.Error, text: 'Pogreška' },
-    { key: FileState.Processing, text: 'U obradi' },
-    { key: FileState.Indexing, text: 'Indeksiranje' },
-    { key: FileState.Queued, text: 'U redu čekanja' },
-    { key: FileState.Skipped, text: 'Preskočeno'},
-    { key: FileState.UPLOADED, text: 'Preneseno'},
-    { key: FileState.THROTTLED, text: 'Ograničeno'},    
-    { key: FileState.DELETING, text: 'Brisanje'},  
-    { key: FileState.DELETED, text: 'Izbrisano'},  
-  ];
 
 
 interface Props {
@@ -47,6 +23,35 @@ interface Props {
 }
 
 export const FileStatus = ({ className }: Props) => {
+    const { t } = useTranslation();
+
+    const dropdownTimespanOptions = [
+        { key: 'Time Range', text: t('FileStatus.TimeRangeEnd'), itemType: DropdownMenuItemType.Header },
+        { key: '4hours', text: t('FileStatus.TimeRange4') },
+        { key: '12hours', text: t('FileStatus.TimeRange12')},
+        { key: '24hours', text: t('FileStatus.TimeRange24') },
+        { key: '7days', text: t('FileStatus.TimeRange7days') },
+        { key: '30days', text: t('FileStatus.TimeRange30days') },
+        { key: '-1days', text: t('FileStatus.TimeRangeALLdays') },
+      ];
+    
+    const dropdownFileStateOptions = [
+        { key: 'FileStates', text: t('FileStatus.FileStates'), itemType: DropdownMenuItemType.Header },
+        { key: FileState.All, text: t('FileStatus.FileStateAll') },
+        { key: FileState.Complete, text: t('FileStatus.FileStateComplete') },
+        { key: FileState.Error, text: t('FileStatus.FileStateError') },
+        { key: FileState.Processing, text: t('FileStatus.FileStateProcessing') },
+        { key: FileState.Indexing, text: t('FileStatus.FileStateIndexing') },
+        { key: FileState.Queued, text: t('FileStatus.FileStateQueued') },
+        { key: FileState.Skipped, text: t('FileStatus.FileStateSkipped') },
+        { key: FileState.UPLOADED, text: t('FileStatus.FileStateUPLOADED') },
+        { key: FileState.THROTTLED, text: t('FileStatus.FileStateTHROTTLED') },    
+        { key: FileState.DELETING, text: t('FileStatus.FileStateDELETING') },  
+        { key: FileState.DELETED, text: t('FileStatus.FileStateDELETED') },   
+      ];
+
+      
+
     const [selectedTimeFrameItem, setSelectedTimeFrameItem] = useState<IDropdownOption>();
     const [selectedFileStateItem, setSelectedFileStateItem] = useState<IDropdownOption>();
     const [SelectedFolderItem, setSelectedFolderItem] = useState<IDropdownOption>();
@@ -201,7 +206,7 @@ export const FileStatus = ({ className }: Props) => {
         <div className={styles.container}>
             <div className={`${styles.options} ${className ?? ""}`} >
                 <Dropdown
-                        label="Učitano u posljednjih:"
+                        label={t("FileStatus.UploadedInLast")}
                         defaultSelectedKey='4hours'
                         onChange={onTimeSpanChange}
                         placeholder="Select a time range"
@@ -210,7 +215,7 @@ export const FileStatus = ({ className }: Props) => {
                         aria-label="timespan options for file statuses to be displayed"
                     />
                 <Dropdown
-                        label="Status dokumenta:"
+                        label={t("FileStatus.FileState")}
                         defaultSelectedKey={'ALL'}
                         onChange={onFileStateChange}
                         placeholder="Select file states"
@@ -219,19 +224,19 @@ export const FileStatus = ({ className }: Props) => {
                         aria-label="file state options for file statuses to be displayed"
                     />
                 <Dropdown
-                    label="Mapa:"
+                    label={t("Folder")}
                     defaultSelectedKey={'Root'}
                     onChange={onFolderChange}
-                    placeholder="Odabir mape"
+                    placeholder={t("FileStatus.SelectFolder")}
                     options={folderOptions}
                     styles={dropdownFolderStyles}
                     aria-label="folder options for file statuses to be displayed"
                 />
                 <Dropdown
-                    label="Oznaka:"
+                    label={t("FileStatus.Tag")}
                     defaultSelectedKey={'All'}
                     onChange={onTagChange}
-                    placeholder="Odabir oznake"
+                    placeholder={t("FileStatus.SelectTag")}
                     options={tagOptions}
                     styles={dropdownTagStyles}
                     aria-label="tag options for file statuses to be displayed"
@@ -242,7 +247,7 @@ export const FileStatus = ({ className }: Props) => {
                      <Stack className={styles.loadingContainer} verticalAlign="space-between">
                         <Stack.Item grow>
                             <p className={styles.loadingText}>
-                                Dohvat statusa dokumenata
+                                t("FileStatus.LoadingText")
                                 <span className={styles.loadingdots} />
                             </p>
                         </Stack.Item>

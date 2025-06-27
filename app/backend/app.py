@@ -7,19 +7,27 @@ from datetime import datetime
 import asyncio
 import logging
 import os
+import io
 import json
 import urllib.parse
 import pandas as pd
-from pydantic import BaseModel
+import pdfplumber
+import openai
+# import tempfile
+from openai import  AsyncAzureOpenAI
+from docx import Document
+from PIL import Image
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile, Form
 from fastapi.responses import RedirectResponse, StreamingResponse
-import openai
+from approaches.introduction_approcach import IntroductionApproach
+from approaches.credit_approval_approach import CreditApprovalApproach
+from approaches.odluke_odbora_approach import OdlukeOdboraApproach
 from approaches.comparewebwithwork import CompareWebWithWork
 from approaches.compareworkwithweb import CompareWorkWithWeb
 from approaches.chatreadretrieveread import ChatReadRetrieveReadApproach
 from approaches.documentsummary import DocumentSummary
-from approaches.decisionproposal import DecisionProposal
+from approaches.decision_proposal import DecisionProposal
 from approaches.chatwebretrieveread import ChatWebRetrieveRead
 from approaches.gpt_direct_approach import GPTDirectApproach
 from approaches.approach import Approaches
@@ -27,6 +35,8 @@ from azure.identity import ManagedIdentityCredential, AzureAuthorityHosts, Defau
 from azure.mgmt.cognitiveservices import CognitiveServicesManagementClient
 from azure.search.documents import SearchClient
 from azure.storage.blob import BlobServiceClient, ContentSettings
+# from pdf2docx import Converter
+from pydantic import BaseModel
 from approaches.mathassistant import(
     generate_response,
     process_agent_response,
@@ -160,6 +170,11 @@ search_client = SearchClient(
     audience=ENV["AZURE_SEARCH_AUDIENCE"]
 )
 
+client = AsyncAzureOpenAI(
+        azure_endpoint = ENV["AZURE_OPENAI_ENDPOINT"],
+        azure_ad_token_provider=token_provider,
+        api_version=openai.api_version)
+
 blob_client = BlobServiceClient(
     account_url=ENV["AZURE_BLOB_STORAGE_ENDPOINT"],
     credential=azure_credential,
@@ -263,6 +278,71 @@ chat_approaches = {
                                     token_provider,
                                     str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
                                 ),
+    Approaches.Introduction: IntroductionApproach(
+                                    search_client,
+                                    ENV["AZURE_OPENAI_ENDPOINT"],
+                                    ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
+                                    ENV["KB_FIELDS_SOURCEFILE"],
+                                    ENV["KB_FIELDS_CONTENT"],
+                                    ENV["KB_FIELDS_PAGENUMBER"],
+                                    ENV["KB_FIELDS_CHUNKFILE"],
+                                    ENV["AZURE_BLOB_STORAGE_CONTAINER"],
+                                    blob_client,
+                                    ENV["QUERY_TERM_LANGUAGE"],
+                                    MODEL_NAME,
+                                    MODEL_VERSION,
+                                    ENV["TARGET_EMBEDDINGS_MODEL"],
+                                    ENV["ENRICHMENT_APPSERVICE_URL"],
+                                    ENV["TARGET_TRANSLATION_LANGUAGE"],
+                                    ENV["AZURE_AI_ENDPOINT"],
+                                    ENV["AZURE_AI_LOCATION"],
+                                    token_provider,
+                                    str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
+                                ),
+    
+    Approaches.CreditApproval: CreditApprovalApproach(
+                                    search_client,
+                                    ENV["AZURE_OPENAI_ENDPOINT"],
+                                    ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
+                                    ENV["KB_FIELDS_SOURCEFILE"],
+                                    ENV["KB_FIELDS_CONTENT"],
+                                    ENV["KB_FIELDS_PAGENUMBER"],
+                                    ENV["KB_FIELDS_CHUNKFILE"],
+                                    ENV["AZURE_BLOB_STORAGE_CONTAINER"],
+                                    blob_client,
+                                    ENV["QUERY_TERM_LANGUAGE"],
+                                    MODEL_NAME,
+                                    MODEL_VERSION,
+                                    ENV["TARGET_EMBEDDINGS_MODEL"],
+                                    ENV["ENRICHMENT_APPSERVICE_URL"],
+                                    ENV["TARGET_TRANSLATION_LANGUAGE"],
+                                    ENV["AZURE_AI_ENDPOINT"],
+                                    ENV["AZURE_AI_LOCATION"],
+                                    token_provider,
+                                    str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
+                                ),
+    
+    Approaches.OdlukeOdbora: OdlukeOdboraApproach(
+                                    search_client,
+                                    ENV["AZURE_OPENAI_ENDPOINT"],
+                                    ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
+                                    ENV["KB_FIELDS_SOURCEFILE"],
+                                    ENV["KB_FIELDS_CONTENT"],
+                                    ENV["KB_FIELDS_PAGENUMBER"],
+                                    ENV["KB_FIELDS_CHUNKFILE"],
+                                    ENV["AZURE_BLOB_STORAGE_CONTAINER"],
+                                    blob_client,
+                                    ENV["QUERY_TERM_LANGUAGE"],
+                                    MODEL_NAME,
+                                    MODEL_VERSION,
+                                    ENV["TARGET_EMBEDDINGS_MODEL"],
+                                    ENV["ENRICHMENT_APPSERVICE_URL"],
+                                    ENV["TARGET_TRANSLATION_LANGUAGE"],
+                                    ENV["AZURE_AI_ENDPOINT"],
+                                    ENV["AZURE_AI_LOCATION"],
+                                    token_provider,
+                                    str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
+                                ),
     Approaches.ChatWebRetrieveRead: ChatWebRetrieveRead(
                                     MODEL_NAME,
                                     ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
@@ -315,6 +395,22 @@ chat_approaches = {
 }
 
 IS_READY = True
+def get_file_from_blob_storage(file_path: str):
+    container_name, blob_name = file_path.split('/', 1)
+
+    # Download the blob to a local file
+    
+    citation_blob_client = blob_upload_container_client.get_blob_client(blob=blob_name)
+    stream = citation_blob_client.download_blob().chunks()
+    blob_properties = citation_blob_client.get_blob_properties()
+
+    return StreamingResponse(stream,
+                             media_type=blob_properties.content_settings.content_type, 
+                             headers={"Content-Disposition": f"inline; filename={blob_name}"})
+class TranslateRequest(BaseModel):
+    text: str
+    source_language: str
+    target_language: str
 
 # Create API
 app = FastAPI(
@@ -372,12 +468,15 @@ async def chat(request: Request):
         if (Approaches(int(approach)) == Approaches.CompareWorkWithWeb or
             Approaches(int(approach)) == Approaches.DocumentSummary or
             Approaches(int(approach)) == Approaches.DecisionProposal or
+            Approaches(int(approach)) == Approaches.OdlukeOdbora or
+            Approaches(int(approach)) == Approaches.CreditApproval or
             Approaches(int(approach)) == Approaches.CompareWebWithWork):
             r = impl.run(json_body.get("history", []),
                          json_body.get("overrides", {}),
                          json_body.get("citation_lookup", {}),
                          json_body.get("thought_chain", {}))
         else:
+            # Approaches.Introduction - treba li njega negdi?
             r = impl.run(json_body.get("history", []),
                          json_body.get("overrides", {}),
                          {},
@@ -670,6 +769,7 @@ async def get_citation(request: Request):
     try:
         json_body = await request.json()
         citation = urllib.parse.unquote(json_body.get("citation"))    
+        log.debug(f"citation: {citation}")
         blob = blob_container.get_blob_client(citation).download_blob()
         decoded_text = blob.readall().decode()
         results = json.loads(decoded_text)
@@ -677,6 +777,148 @@ async def get_citation(request: Request):
         log.exception("Exception in /getcitation")
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     return results
+
+async def extract_text_from_streaming_response(pdf_file):
+    text = ""
+    # Open PDF with pdfplumber and extract text
+    with pdfplumber.open(pdf_file) as pdf:
+        text += "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
+
+    return text
+
+async def translate_text_gpt(text, sourceLanguage, targetLanguage):
+    messages = [
+        {"role": "system", "content": "You are a professional translator."},
+        {"role": "user", "content": f"Translate the following text from ${sourceLanguage} to ${targetLanguage} while keeping the format:\n\n{text}"}
+    ]
+    try:
+        chat_completion= await client.chat.completions.create(
+                model=MODEL_NAME,
+                messages=messages,
+                temperature=0.0,
+                # max_tokens=32, # setting it too low may cause malformed JSON
+                max_tokens=1000,
+            n=1)
+    except Exception as e:
+        log.error(f"Error generating optimized keyword search: {str(e)}")
+
+    return chat_completion.choices[0].message.content
+
+
+async def get_pdf_stream(file_stream: StreamingResponse):
+    file_bytes = b"".join([chunk async for chunk in file_stream.body_iterator])
+    pdf_file = io.BytesIO(file_bytes)
+    return pdf_file
+
+
+def mock_translate(text: str) -> str:
+    translations = {
+        "Hello": "Hola",
+        "How are you?": "¿Cómo estás?",
+        "Goodbye": "Adiós"
+    }
+    return translations.get(text, f"Translated({text})")
+
+
+@app.post("/translate_text")
+async def translate_text(request: TranslateRequest):
+    if not request.text:
+        raise HTTPException(status_code=400, detail="Text is required")
+    translated_text = await translate_text_gpt(request.text, request.source_language, request.target_language)
+    return {"translatedText": translated_text}
+
+@app.post("/translate-pdf")
+async def get_translated_pdf(file_path: str):
+    original_file = get_file_from_blob_storage(file_path)
+    # original_file_copy = get_file_from_blob_storage(file_path)
+
+    # pdf_stream = await get_pdf_stream(original_file)
+    # docx_stream = pdf_to_docx_stream(pdf_stream)
+    # text_data = extract_text(docx_stream)
+
+    # # text = await extract_text_from_streaming_response(pdf_stream)
+    # text_translated = await translate_text(text_data)
+    # translated_docx_stream = replace_text_in_docx(docx_stream, text_translated)
+    # # translated_pdf_stream = docx_to_pdf_stream(translated_docx_stream)
+    
+    # log.debug(f"text: {text}")
+    # log.debug(f"text_translated: {text_translated}")
+    # output_file = await save_translated_pdf(pdf_stream, text_translated)
+    
+    return original_file
+
+# def pdf_to_docx_stream(pdf_stream):
+#     """ Convert PDF stream to Word stream """
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
+#         temp_pdf.write(pdf_stream.read())
+#         temp_pdf_path = temp_pdf.name
+
+#     docx_path = temp_pdf_path.replace(".pdf", ".docx")
+    
+#     cv = Converter(temp_pdf_path)
+#     cv.convert(docx_path, start=0, end=None)
+#     cv.close()
+
+#     with open(docx_path, "rb") as docx_file:
+#         docx_stream = io.BytesIO(docx_file.read())
+
+#     os.remove(temp_pdf_path)
+#     os.remove(docx_path)
+
+#     return docx_stream
+
+    # return StreamingResponse(
+    #     content=docx_stream,
+    #     media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    #     headers={"Content-Disposition": "attachment; filename=converted_output.docx"})
+
+def extract_text(docx_stream):
+    """ Extract text from Word file while keeping structure """
+    doc = Document(docx_stream)
+    for para in doc.paragraphs:
+        print(f"Debug: {para.text}")
+    return [para.text for para in doc.paragraphs]
+
+def replace_text_in_docx(docx_stream, translated_texts):
+    """ Replace text in Word file while keeping formatting """
+    doc = Document(docx_stream)
+    i = 0
+    for para in doc.paragraphs:
+        if i < len(translated_texts):
+            para.text = translated_texts[i]
+            i += 1
+
+    translated_docx_stream = io.BytesIO()
+    doc.save(translated_docx_stream)
+    translated_docx_stream.seek(0)
+    
+    return StreamingResponse(
+        content=translated_docx_stream,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": "attachment; filename=translated_docx_stream.docx"})
+    # return translated_docx_stream
+
+# def docx_to_pdf_stream(docx_stream):
+#     """ Convert Word stream to PDF using LibreOffice (cross-platform) """
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as temp_docx:
+#         temp_docx.write(docx_stream.read())
+#         temp_docx_path = temp_docx.name
+
+#     pdf_path = temp_docx_path.replace(".docx", ".pdf")
+
+#     # Convert using LibreOffice CLI
+#     command = f"soffice --headless --convert-to pdf {temp_docx_path} --outdir {os.path.dirname(pdf_path)}"
+#     subprocess.run(command, shell=True, check=True)
+
+#     # Read the converted PDF
+#     with open(pdf_path, "rb") as pdf_file:
+#         pdf_stream = BytesIO(pdf_file.read())
+
+#     # Cleanup temporary files
+#     os.remove(temp_docx_path)
+#     os.remove(pdf_path)
+
+#     return pdf_stream
 
 # Return APPLICATION_TITLE
 @app.get("/getApplicationTitle")
@@ -928,21 +1170,20 @@ async def upload_file(
 
 @app.post("/get-file")
 async def get_file(request: Request):
+    """
+    Retrieve a file from Azure Blob Storage and return it as a streaming response.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - A streaming response containing the requested file data.
+    """
     data = await request.json()
     file_path = data['path']
 
-    # Extract container name and blob name from the file path
-    container_name, blob_name = file_path.split('/', 1)
-
-    # Download the blob to a local file
-    
-    citation_blob_client = blob_upload_container_client.get_blob_client(blob=blob_name)
-    stream = citation_blob_client.download_blob().chunks()
-    blob_properties = citation_blob_client.get_blob_properties()
-
-    return StreamingResponse(stream,
-                             media_type=blob_properties.content_settings.content_type, 
-                             headers={"Content-Disposition": f"inline; filename={blob_name}"})
+    original_file = get_file_from_blob_storage(file_path)
+    return original_file
 
 app.mount("/", StaticFiles(directory="static"), name="static")
 

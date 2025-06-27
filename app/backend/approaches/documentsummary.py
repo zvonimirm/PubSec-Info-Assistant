@@ -59,7 +59,7 @@ class DocumentSummary(Approach):
 
 
     # """
-    SYSTEM_MESSAGE_CHAT_CONVERSATION = """ Ti si Azure OpenAI Completion sistem. Tvoja persona je {systemPersona} a korisnička persona je {userPersona}.
+    SYSTEM_MESSAGE_CHAT_CONVERSATION_HR = """ Ti si Azure OpenAI Completion sistem. Tvoja persona je {systemPersona} a korisnička persona je {userPersona}.
     
     Ulazni dokument je tužba. Želim da mi napraviš sažetak tužbe.
     Naslov neka bude "SAŽETAK DOKUMENTA"
@@ -67,24 +67,33 @@ class DocumentSummary(Approach):
     U sažetku navedi osnovne činjenice i pravne argumente iz tužbe.
     """
 
+    SYSTEM_MESSAGE_CHAT_CONVERSATION = """ You are an Azure OpenAI Completion system. Your persona is {systemPersona}, and the user's persona is {userPersona}.
+    The input document is a lawsuit. I want you to create a summary of the lawsuit.
+    The title should be "DOCUMENT SUMMARY."
+    The summary should be clear and concise, mentioning key names and other essential details.
 
+    Include the main facts and legal arguments from the lawsuit in the summary.
+    """
+    
     FOLLOW_UP_QUESTIONS_PROMPT_CONTENT = """ALWAYS generate three very brief unordered follow-up questions surrounded by triple chevrons (<<<Are there exclusions for prescriptions?>>>) that the user would likely ask next about their agencies data. 
     Surround each follow-up question with triple chevrons (<<<Are there exclusions for prescriptions?>>>). Try not to repeat questions that have already been asked.
     Only generate follow-up questions and do not generate any text before or after the follow-up questions, such as 'Next Questions'
     """
+    QUERY_PROMPT_TEMPLATE_HR = """Generiraj novi dokument s istom strukturom i tonom kao primjeri pronađeni u izvornim dokumentima.
 
+Ispod se nalazi povijest dosadašnjeg razgovora i novo pitanje koje je korisnik postavio, a na koje je potrebno odgovoriti pretraživanjem izvora ili kombiniranjem informacija iz razgovora.
+    """
     QUERY_PROMPT_TEMPLATE = """Generate a new document with the same structure and tone as the examples found in source documents.
     Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching in source documents or cobbling together information from the conversation.
-    Generate a search query based on the conversation and the new question. Treat each search term as an individual keyword. Do not combine terms in quotes or brackets.
-    Do not include cited source filenames and document names e.g info.txt or doc.pdf in the search query terms.
-    Do not include any text inside [] or <<<>>> in the search query terms.
-    Do not include any special characters like '+'.
-    If you cannot generate a search query, return just the number 0.
     """
 
+    QUERY_PROMPT_FEW_SHOTS_HR = [
+        {'role' : Approach.USER, 'content' : 'Generiraj mi sažetak dokumenta' },
+        {'role' : Approach.ASSISTANT, 'content' : 'Generiraj sažetak dokumenta na način da bude kratko, koncizno i jasno. Zadrži formatiranje.' }
+    ]
     QUERY_PROMPT_FEW_SHOTS = [
-        {'role' : Approach.USER, 'content' : 'Generate a draft judgment based on similar cases in source documents.' },
-        {'role' : Approach.ASSISTANT, 'content' : 'Find similar legal cases and generate a new draft judgment based on similar cases in source documents.' }
+        {'role' : Approach.USER, 'content' : 'Generate document summary' },
+        {'role' : Approach.ASSISTANT, 'content' : 'Generate document summary. The summary should be clear and consise in legal format.' }
     ]
 
     RESPONSE_PROMPT_FEW_SHOTS = [
@@ -161,6 +170,7 @@ class DocumentSummary(Approach):
         response_length = int(overrides.get("response_length") or 1024)
         folder_filter = overrides.get("selected_folders", "")
         tags_filter = overrides.get("selected_tags", "")
+        language = overrides.get("language", "")
 
         user_q = 'Generate search query for: ' + history[-1]["user"]
         thought_chain["work_query"] = user_q
@@ -168,12 +178,18 @@ class DocumentSummary(Approach):
         # Detect the language of the user's question
         detectedlanguage = self.detect_language(user_q)
 
-        if detectedlanguage != self.target_translation_language:
-            user_question = self.translate_response(user_q, self.target_translation_language)
+        if detectedlanguage != language:
+            user_question = self.translate_response(user_q, language)
         else:
             user_question = user_q
 
-        query_prompt=self.QUERY_PROMPT_TEMPLATE.format(query_term_language=self.query_term_language)
+        query_prompt = self.QUERY_PROMPT_TEMPLATE.format(query_term_language=language)
+        if language == "hr":
+            query_prompt=self.QUERY_PROMPT_TEMPLATE_HR.format(query_term_language=language)
+
+        prompt_few_shots = self.QUERY_PROMPT_FEW_SHOTS
+        if language == "hr":
+            prompt_few_shots = self.QUERY_PROMPT_FEW_SHOTS_HR
 
         # STEP 1: Generate an optimized keyword search query based on the chat history and the last question
         messages = self.get_messages_from_history(
@@ -181,7 +197,7 @@ class DocumentSummary(Approach):
             self.model_name,
             history,
             user_question,
-            self.QUERY_PROMPT_FEW_SHOTS,
+            prompt_few_shots,
             self.chatgpt_token_limit - len(user_question)
             )
 
@@ -342,8 +358,12 @@ class DocumentSummary(Approach):
         # Allow client to replace the entire prompt, or to inject into the existing prompt using >>>
         prompt_override = overrides.get("prompt_template")
 
+        system_message_conversation = self.SYSTEM_MESSAGE_CHAT_CONVERSATION
+        if language == "hr":
+            system_message_conversation = self.SYSTEM_MESSAGE_CHAT_CONVERSATION_HR
+
         if prompt_override is None:
-            system_message = self.SYSTEM_MESSAGE_CHAT_CONVERSATION.format(
+            system_message = system_message_conversation.format(
                 query_term_language=self.query_term_language,
                 injected_prompt="",
                 follow_up_questions_prompt=follow_up_questions_prompt,
@@ -354,7 +374,7 @@ class DocumentSummary(Approach):
                 systemPersona=system_persona,
             )
         elif prompt_override.startswith(">>>"):
-            system_message = self.SYSTEM_MESSAGE_CHAT_CONVERSATION.format(
+            system_message = system_message_conversation.format(
                 query_term_language=self.query_term_language,
                 injected_prompt=prompt_override[3:] + "\n ",
                 follow_up_questions_prompt=follow_up_questions_prompt,
@@ -365,7 +385,7 @@ class DocumentSummary(Approach):
                 systemPersona=system_persona,
             )
         else:
-            system_message = self.SYSTEM_MESSAGE_CHAT_CONVERSATION.format(
+            system_message = system_message_conversation.format(
                 query_term_language=self.query_term_language,
                 follow_up_questions_prompt=follow_up_questions_prompt,
                 response_length_prompt=self.get_response_length_prompt_text(

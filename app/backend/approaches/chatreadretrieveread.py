@@ -24,6 +24,9 @@ from text import nonewlines
 from core.modelhelper import get_token_limit
 import requests
 
+# Ova klasa se koristi za pretragu dokumentacije koja je na hrvatskom jeziku!
+# Pitanja i odgovori se prevode na željeni jezik, ali search query ostaje na hrvatskom jeziku.
+
 class ChatReadRetrieveReadApproach(Approach):
     """Approach that uses a simple retrieve-then-read implementation, using the Azure AI Search and
     Azure OpenAI APIs directly. It first retrieves top documents from search,
@@ -31,9 +34,31 @@ class ChatReadRetrieveReadApproach(Approach):
     an completion (answer) with that prompt."""
      
 
+    SYSTEM_MESSAGE_CHAT_CONVERSATION_HR = """Vi ste Azure OpenAI Completion sustav. Vaša persona je {systemPersona}, koja pomaže u odgovaranju na pitanja o podacima agencije. {response_length_prompt}
+    Korisnička persona je {userPersona}. Odgovarajte SAMO s činjenicama navedenima u popisu izvora u nastavku, uz navođenje izvora. Ako nema dovoljno informacija u nastavku, recite da ne znate i nemojte navoditi izvore. Za tablične podatke vratite ih kao HTML tablicu. Nemojte koristiti Markdown format.
 
+    Vaš cilj je pružiti odgovore temeljene na činjenicama iz navedenih izvora. Izbjegavajte pretpostavke, spekulacije, generalizirane informacije ili osobna mišljenja.
+
+    Svaki izvor sadrži sadržaj, nakon kojeg slijedi znak "|" i URL. Umjesto navođenja cijelog URL-a, citirajte ga pomoću oznaka poput [File1], [File2], itd., prema njihovom redoslijedu u popisu. Nemojte kombinirati izvore; navedite svaki URL zasebno, npr. [File1] [File2].
+    Nikada ne citirajte sadržaj izvora pomoću primjera u ovom odlomku koji počinju s "info".
+
+    Izvori:
+
+    Sadržaj o temi A | info.pdf
+    Sadržaj o temi B | example.txt
+    Referencirajte ih kao [File1] i [File2] u svojim odgovorima.
+
+    Evo kako trebate odgovarati na svako pitanje:
+
+    Potražite informacije u izvornim dokumentima kako biste odgovorili na pitanje na jeziku {query_term_language}.
+    Ako izvorni dokument sadrži odgovor, odgovorite s navođenjem izvora. Svaki dokument na koji se referencirate navedite samo jednom.
+    Ako ne možete pronaći odgovor u navedenim izvorima, odgovorite s "Nisam siguran." Nemojte davati osobna mišljenja, pretpostavke ili navoditi izvore.
+    Identificirajte jezik korisničkog pitanja i prevedite konačni odgovor na taj jezik. Ako je konačan odgovor "Nisam siguran", također ga prevedite na jezik korisničkog pitanja i prikažite samo prevedeni odgovor, bez dodatnih informacija.
+    {follow_up_questions_prompt}
+    {injected_prompt}
+    """
     SYSTEM_MESSAGE_CHAT_CONVERSATION = """You are an Azure OpenAI Completion system. Your persona is {systemPersona} who helps answer questions about an agency's data. {response_length_prompt}
-    User persona is {userPersona} Answer ONLY with the facts listed in the list of sources below in {query_term_language} with citations.If there isn't enough information below, say you don't know and do not give citations. For tabular information return it as an html table. Do not return markdown format.
+    User persona is {userPersona} Answer ONLY with the facts listed in the list of sources with citations. If there isn't enough information below, say you don't know and do not give citations. For tabular information return it as an html table. Do not return markdown format.
     Your goal is to provide answers based on the facts listed below in the provided source documents. Avoid making assumptions,generating speculative or generalized information or adding personal opinions.
    
     Each source has content followed by a pipe character and the URL. Instead of writing the full URL, cite it using placeholders like [File1], [File2], etc., based on their order in the list. Do not combine sources; list each source URL separately, e.g., [File1] [File2].
@@ -48,7 +73,7 @@ class ChatReadRetrieveReadApproach(Approach):
     
     -Look for information in the source documents to answer the question in {query_term_language}.
     -If the source document has an answer, please respond with citation.You must include a citation to each document referenced only once when you find answer in source documents.      
-    -If you cannot find answer in below sources, respond with I am not sure.Do not provide personal opinions or assumptions and do not include citations.
+    -If you cannot find answer in below sources, respond with I am not sure. Do not provide personal opinions or assumptions and do not include citations.
     -Identify the language of the user's question and translate the final response to that language.if the final answer is " I am not sure" then also translate it to the language of the user's question and then display translated response only. nothing else.
 
     {follow_up_questions_prompt}
@@ -59,6 +84,13 @@ class ChatReadRetrieveReadApproach(Approach):
     Surround each follow-up question with triple chevrons (<<<Are there exclusions for prescriptions?>>>). Try not to repeat questions that have already been asked.
     Only generate follow-up questions and do not generate any text before or after the follow-up questions, such as 'Next Questions'
     """
+    QUERY_PROMPT_TEMPLATE_HR = """Ispod se nalazi povijest dosadašnjeg razgovora i novo pitanje koje je korisnik postavio, a koje treba odgovoriti pretraživanjem izvorišnih dokumenata.  
+    Generiraj upit za pretragu na temelju razgovora i novog pitanja. Svaki pojam za pretragu tretiraj kao zasebnu ključnu riječ. Nemoj kombinirati pojmove unutar navodnika ili zagrada.  
+    Nemoj uključivati nazive citiranih izvora i dokumenata, npr. info.txt ili doc.pdf, u pojmove za pretragu.  
+    Nemoj uključivati bilo koji tekst unutar [] ili <<<>>> u pojmove za pretragu.  
+    Nemoj uključivati posebne znakove poput '+'.  
+    Ako ne možeš generirati upit za pretragu, vrati samo broj 0.  
+    """
 
     QUERY_PROMPT_TEMPLATE = """Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching in source documents.
     Generate a search query based on the conversation and the new question. Treat each search term as an individual keyword. Do not combine terms in quotes or brackets.
@@ -67,7 +99,15 @@ class ChatReadRetrieveReadApproach(Approach):
     Do not include any special characters like '+'.
     If you cannot generate a search query, return just the number 0.
     """
+    QUERY_PROMPT_FEW_SHOTS_HR = [
+        {'role' : Approach.USER, 'content' : 'Koji su primjeri revizija odluka županijskog suda?' },
+        {'role' : Approach.ASSISTANT, 'content' : 'Primjeri revizija odluka županijskog suda' }
+    ]
 
+    RESPONSE_PROMPT_FEW_SHOTS_HR = [
+        {"role": Approach.USER ,'content': 'Tražim informacije u izvornim dokumentima'},
+        {'role': Approach.ASSISTANT, 'content': 'Korisnik traži informacije u izvornim dokumentima. Nemoj odgovarati na pitanja koja nisu u izvornim dokumentima'}
+    ]
     QUERY_PROMPT_FEW_SHOTS = [
         {'role' : Approach.USER, 'content' : 'What are the examples of revisions county court decisions?' },
         {'role' : Approach.ASSISTANT, 'content' : 'Examples of revisions county court decisions' }
@@ -152,6 +192,7 @@ class ChatReadRetrieveReadApproach(Approach):
         response_length = int(overrides.get("response_length") or 1024)
         folder_filter = overrides.get("selected_folders", "")
         tags_filter = overrides.get("selected_tags", "")
+        language = overrides.get("language", "")
 
         user_q = 'Generate search query for: ' + history[-1]["user"]
         thought_chain["work_query"] = user_q
@@ -159,22 +200,39 @@ class ChatReadRetrieveReadApproach(Approach):
         # Detect the language of the user's question
         detectedlanguage = self.detect_language(user_q)
 
-        if detectedlanguage != self.target_translation_language:
-            user_question = self.translate_response(user_q, self.target_translation_language)
+        if detectedlanguage != language:
+            user_question = self.translate_response(user_q, language)
         else:
             user_question = user_q
 
-        query_prompt=self.QUERY_PROMPT_TEMPLATE.format(query_term_language=self.query_term_language)
+        query_prompt = self.QUERY_PROMPT_TEMPLATE
+        if language == "hr":
+            query_prompt = self.QUERY_PROMPT_TEMPLATE_HR
 
+        query_prompt=query_prompt.format(query_term_language=language)
+        
+        prompt_few_shots = self.QUERY_PROMPT_FEW_SHOTS
+        if language == "hr":
+            prompt_few_shots = self.QUERY_PROMPT_FEW_SHOTS_HR
         # STEP 1: Generate an optimized keyword search query based on the chat history and the last question
+        # if language == "hr":
+        #     messages = self.get_messages_from_history(
+        #     query_prompt,
+        #     self.model_name,
+        #     history,
+        #     user_question,
+        #     self.QUERY_PROMPT_FEW_SHOTS_HR,
+        #     self.chatgpt_token_limit - len(user_question)
+        #     )
+        # else:
         messages = self.get_messages_from_history(
-            query_prompt,
-            self.model_name,
-            history,
-            user_question,
-            self.QUERY_PROMPT_FEW_SHOTS,
-            self.chatgpt_token_limit - len(user_question)
-            )
+        query_prompt,
+        self.model_name,
+        history,
+        user_question,
+        prompt_few_shots,
+        self.chatgpt_token_limit - len(user_question)
+        )
 
         try:
             chat_completion= await self.client.chat.completions.create(
@@ -182,7 +240,7 @@ class ChatReadRetrieveReadApproach(Approach):
                     messages=messages,
                     temperature=0.0,
                     # max_tokens=32, # setting it too low may cause malformed JSON
-                    max_tokens=100,
+                    max_tokens=300,
                 n=1)
                 # Initialize a list to collect filter reasons
             filter_reasons = []
@@ -268,6 +326,9 @@ class ChatReadRetrieveReadApproach(Approach):
 
         #  hybrid semantic search using semantic reranker
         if (self.use_semantic_reranker and overrides.get("semantic_ranker")):
+            # if(language == "en"): 
+                # generated_query = self.translate_response(generated_query, "hr")
+                # log.debug("Generated query 1: " + generated_query)
             r = self.search_client.search(
                 generated_query,
                 query_type=QueryType.SEMANTIC,
@@ -333,9 +394,13 @@ class ChatReadRetrieveReadApproach(Approach):
         # Allow client to replace the entire prompt, or to inject into the existing prompt using >>>
         prompt_override = overrides.get("prompt_template")
 
+        system_message_conversation = self.SYSTEM_MESSAGE_CHAT_CONVERSATION
+        if language == "hr":
+            system_message_conversation = self.SYSTEM_MESSAGE_CHAT_CONVERSATION_HR
+
         if prompt_override is None:
-            system_message = self.SYSTEM_MESSAGE_CHAT_CONVERSATION.format(
-                query_term_language=self.query_term_language,
+            system_message = system_message_conversation.format(
+                query_term_language=language,
                 injected_prompt="",
                 follow_up_questions_prompt=follow_up_questions_prompt,
                 response_length_prompt=self.get_response_length_prompt_text(
@@ -345,8 +410,8 @@ class ChatReadRetrieveReadApproach(Approach):
                 systemPersona=system_persona,
             )
         elif prompt_override.startswith(">>>"):
-            system_message = self.SYSTEM_MESSAGE_CHAT_CONVERSATION.format(
-                query_term_language=self.query_term_language,
+            system_message = system_message.format(
+                query_term_language=language,
                 injected_prompt=prompt_override[3:] + "\n ",
                 follow_up_questions_prompt=follow_up_questions_prompt,
                 response_length_prompt=self.get_response_length_prompt_text(
@@ -356,8 +421,8 @@ class ChatReadRetrieveReadApproach(Approach):
                 systemPersona=system_persona,
             )
         else:
-            system_message = self.SYSTEM_MESSAGE_CHAT_CONVERSATION.format(
-                query_term_language=self.query_term_language,
+            system_message = system_message.format(
+                query_term_language=language,
                 follow_up_questions_prompt=follow_up_questions_prompt,
                 response_length_prompt=self.get_response_length_prompt_text(
                     response_length
@@ -369,6 +434,9 @@ class ChatReadRetrieveReadApproach(Approach):
         try:
             # STEP 3: Generate a contextual and content-specific answer using the search results and chat history.
             #Added conditional block to use different system messages for different models.
+            prompt_few_shots = self.QUERY_PROMPT_FEW_SHOTS
+            if language == "hr":
+                prompt_few_shots = self.QUERY_PROMPT_FEW_SHOTS_HR
 
             messages = self.get_messages_from_history(
                 system_message,
@@ -377,9 +445,10 @@ class ChatReadRetrieveReadApproach(Approach):
                 history,
                 # history[-1]["user"],
                 history[-1]["user"] + "Sources:\n" + content + "\n\n", # GPT 4 starts to degrade with long system messages. so moving sources here 
-                self.RESPONSE_PROMPT_FEW_SHOTS,
+                prompt_few_shots,
                 max_tokens=self.chatgpt_token_limit
             )
+           
             # Generate the chat completion
             chat_completion= await self.client.chat.completions.create(
                 model=self.chatgpt_deployment,
@@ -387,7 +456,6 @@ class ChatReadRetrieveReadApproach(Approach):
                 temperature=float(overrides.get("response_temp")) or 0.6,
                 n=1,
                 stream=True
-            
             )
             msg_to_display = '\n\n'.join([str(message) for message in messages])
         

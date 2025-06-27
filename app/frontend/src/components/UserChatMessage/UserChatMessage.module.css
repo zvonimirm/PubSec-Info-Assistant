@@ -18,11 +18,19 @@
 
 .messagework {
     padding: 20px;
-    background: linear-gradient(130deg, #2870EA 20%, #1B4AEF 77.5%);
+    background: linear-gradient(130deg, #0066CC 30%, #2c7bca 70%, #0066CC 90%);
     border-radius: 8px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
     outline: transparent solid 1px;
 }
+
+.messageIntroduction {
+    /* background: rgb(228, 232, 236); */
+    font-weight: 700;
+    font-size: 20px;
+    border-radius: 8px;
+}
+
 
 .messageweb {
     padding: 20px;
@@ -74,18 +82,43 @@
 }
 
 .messageungroundedtext {
-    padding-left: 10px;
-    font-size: 16px;
+    padding-left: 36px;
+    font-size: 24px;
     line-height: 22px;
     font-weight: 700;
     font-variation-settings: unset;
 }
+.userMessageIntroduction {
+    flex-grow: 1;
+    max-width: 1028px;
+    width: 100%;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* or 'scroll' if you always want the scrollbar to be visible */
+    max-height: calc(100vh - 313px); /* optional, adjust according to your layout */
+    color: rgb(0, 0, 0);
+
+    font-size:22px;
+    font-weight: 400;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    border: rgb(230, 230, 230) solid 1px;
+    background-color: white;
+    border-radius: 12px;
+}
 
 .userMessage {
     color: white;
+    font-size: 22px;
 }
 
 .userMessageUngrounded {
     color: rgba(0, 0, 0, 1);
     padding-left: 36px;
 }
+

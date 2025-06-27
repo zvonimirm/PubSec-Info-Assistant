@@ -8,6 +8,7 @@ import { RAIPanel } from "../RAIPanel";
 
 import styles from "./QuestionInput.module.css";
 import { Button } from "react-bootstrap";
+import { t } from "i18next";
 
 interface Props {
     onSend: (question: string) => void;
@@ -77,13 +78,14 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, onAd
                             onMouseLeave={onMouseLeave}
                         >
                             <Broom28Filled primaryFill="rgba(255, 255, 255, 1)" />
-                            <span id={"test"} hidden={clearChatTextEnabled}>Očisti razgovor</span>
+                            <span id={"test"} hidden={clearChatTextEnabled}>{t("Question.Input.OcistiRazgovor")}</span>
                         </div>
                     </div>
                 )
                 : null}
                 <TextField
                     className={styles.questionInputTextArea}
+                    styles={{ field: { fontSize: "24px", lineHeight: "1.2" } }}
                     placeholder={placeholder}
                     multiline
                     resizable={false}

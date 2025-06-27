@@ -1,0 +1,93 @@
+.backgroundContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../../assets/Podloga.jpg');
+    background-size: cover;
+    /* background: radial-gradient(circle at 50% 30%, #e3f0f7, #797979); */
+}
+.mainContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-self: center;
+    height: 100%;
+    /* border: red solid 2px; */
+    width: 100%;
+}
+.holderContainer{
+    /* border: red solid 2px; */
+    width: 25%;
+
+}
+
+.topicContainer
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 35%;
+    padding: 10px;
+    /* border: red solid 2px; */
+}
+.rightContainer{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    width: 25%;
+    /* border: red solid 2px; */
+}
+.languageContainer{
+    /* border: yellow solid 2px; */
+    height: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding-top: 30px;
+    padding-right: 35px;
+}
+.logoContainer{
+    /* border: yellow solid 2px; */
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-bottom: 30px;
+    padding-right: 50px;
+}
+.btnContainer{
+    background: linear-gradient(0,#fe9b00, #ffc401);
+    border: solid;
+    border-radius: 100px;
+    color: white;
+    border-width: 6px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 32px;
+    font-weight: 800;
+    height: 15%;
+    width: 100%;
+    margin: 4px 2px;
+    cursor: pointer;
+    padding: 10px 24px;
+    transition-duration: 0.4s;
+    align-content: center;
+
+
+}
+.btnContainer:hover{
+    cursor: pointer;
+    box-shadow: 0px 4px 15px rgba(209, 209, 209, 0.7);
+
+}
+.aseeLogo{
+    width:200px;
+    height: 66px;
+}

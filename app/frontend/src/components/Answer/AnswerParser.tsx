@@ -45,7 +45,7 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
     var work_fragments: string[] = [];
     var web_fragments: string[] = [];
 
-    if (approach == Approaches.ChatWebRetrieveRead || approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary || approach == Approaches.DecisionProposal) {
+    if (approach == Approaches.ChatWebRetrieveRead || approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary || approach == Approaches.DecisionProposal || approach == Approaches.OdlukeOdbora || approach == Approaches.CreditApproval) {
         // Split the answer into parts, where the odd parts are citations
         const parts = parsedAnswer.split(/\[([^\]]+)\]/g);
         const pattern = /^\w+[0-9]$/;
@@ -54,7 +54,7 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
                 // Even parts are just text
                 return part;
             } else {
-                if (approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary || approach == Approaches.DecisionProposal) {
+                if (approach == Approaches.ReadRetrieveRead || approach == Approaches.DocumentSummary || approach == Approaches.DecisionProposal || approach == Approaches.OdlukeOdbora || approach == Approaches.CreditApproval) {
                     const citation_lookup = work_citation_lookup;
                     // LLM Sometimes refers to citations as "source"
                     part = part.replace(/\w+(\d)$/, 'File$1');
@@ -216,8 +216,13 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
             return "";
         });
     }
-    if (approach == Approaches.GPTDirect) {
-        fragments.push(parsedAnswer);
+    if (approach == Approaches.GPTDirect || approach == Approaches.Introduction) {
+        console.log("GPTDirect or Introduction approach");
+        console.log(parsedAnswer);
+        console.log("PARSED");
+        const parsedRegex = parsedAnswer.replace(/\bisFinal:true\b/gi, "").trim();
+        console.log(parsedRegex);
+        fragments.push(parsedRegex);
     }
     
 

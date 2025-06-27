@@ -5,6 +5,7 @@ import { Button, ButtonGroup } from "react-bootstrap";
 import { Label } from "@fluentui/react";
 
 import styles from "./ResponseTempButtonGroup.module.css";
+import { t } from "i18next";
 
 interface Props {
     className?: string;
@@ -15,11 +16,11 @@ interface Props {
 export const ResponseTempButtonGroup = ({ className, onClick, defaultValue }: Props) => {
     return (
         <div className={`${styles.container} ${className ?? ""}`}>
-            <Label>Način razgovora:</Label>
+            <Label>{t("ResponseTempButtonGroup.NacinRazgovora")}</Label>
             <ButtonGroup className={`${styles.buttongroup ?? ""}`} onClick={onClick}>
-                <Button className={`${defaultValue == 1.0? styles.buttonleftactive : styles.buttonleft ?? ""}`} size="sm" value={1.0} bsPrefix='ia'>{"Kreativno"}</Button>
-                <Button className={`${defaultValue == 0.6? styles.buttonmiddleactive : styles.buttonmiddle ?? ""}`} size="sm" value={0.6} bsPrefix='ia'>{"Balansirano"}</Button>
-                <Button className={`${defaultValue == 0? styles.buttonrightactive : styles.buttonright ?? ""}`} size="sm" value={0} bsPrefix='ia'>{"Precizno"}</Button>
+                <Button className={`${defaultValue == 1.0? styles.buttonleftactive : styles.buttonleft ?? ""}`} size="sm" value={1.0} bsPrefix='ia'>{t("ResponseTempButtonGroup.Kreativno")}</Button>
+                <Button className={`${defaultValue == 0.6? styles.buttonmiddleactive : styles.buttonmiddle ?? ""}`} size="sm" value={0.6} bsPrefix='ia'>{t("ResponseTempButtonGroup.Balansirano")}</Button>
+                <Button className={`${defaultValue == 0? styles.buttonrightactive : styles.buttonright ?? ""}`} size="sm" value={0} bsPrefix='ia'>{t("ResponseTempButtonGroup.Precizno")}</Button>
             </ButtonGroup>
         </div>
     );

@@ -7,6 +7,7 @@ import { Label } from '@fluentui/react/lib/Label';
 import { Separator } from '@fluentui/react/lib/Separator';
 import { getInfoData, GetInfoResponse  } from "../../api";
 import appVersionInfo from '../../../version.json';
+import { t } from "i18next";
 
 interface Props {
     className?: string;
@@ -32,13 +33,13 @@ export const InfoContent = ({ className }: Props) => {
 
     return (
         <div>
-            <Separator>Verzija</Separator>
+            <Separator>{t("InfoContent.Verzija")}</Separator>
             <Text>{appVersionInfo?.version}</Text>
-            <Separator>Azure OpenAI</Separator>
-            <Label>Instanca</Label><Text>{infoData?.AZURE_OPENAI_SERVICE}</Text>
-            <Label>Naziv GPT implementacije</Label><Text>{infoData?.AZURE_OPENAI_CHATGPT_DEPLOYMENT}</Text>
-            <Label>Naziv GPT modela</Label><Text>{infoData?.AZURE_OPENAI_MODEL_NAME}</Text>
-            <Label>Verzija GPT modela</Label><Text>{infoData?.AZURE_OPENAI_MODEL_VERSION}</Text>
+            <Separator>{t("InfoContent.AzureOpenAI")}</Separator>
+            <Label>{t("InfoContent.Instanca")}</Label><Text>{infoData?.AZURE_OPENAI_SERVICE}</Text>
+            <Label>{t("InfoContent.NazivGPTImplementacije")}</Label><Text>{infoData?.AZURE_OPENAI_CHATGPT_DEPLOYMENT}</Text>
+            <Label>{t("InfoContent.NazivGPTModela")}</Label><Text>{infoData?.AZURE_OPENAI_MODEL_NAME}</Text>
+            <Label>{t("InfoContent.VerzijaGPTModela")}</Label><Text>{infoData?.AZURE_OPENAI_MODEL_VERSION}</Text>
             {infoData?.USE_AZURE_OPENAI_EMBEDDINGS ? (
             <div>
             <Label>Embeddings Deployment Name</Label><Text>{infoData?.EMBEDDINGS_DEPLOYMENT}</Text>
@@ -47,15 +48,15 @@ export const InfoContent = ({ className }: Props) => {
             </div>
             ) : (
             <div>
-            <Separator>Ugrađeni modeli</Separator>
-            <Label>Ugrađeni modeli</Label><Text>{infoData?.EMBEDDINGS_DEPLOYMENT}</Text>
+            <Separator>{t("InfoContent.UgradeniModeli")}</Separator>
+            <Label>{t("InfoContent.UgradeniModeli")}</Label><Text>{infoData?.EMBEDDINGS_DEPLOYMENT}</Text>
             </div>
             )}
-            <Separator>Azure AI pretraga</Separator>
-            <Label>Naziv usluge</Label><Text>{infoData?.AZURE_SEARCH_SERVICE}</Text>
-            <Label>Naziv indkesa</Label><Text>{infoData?.AZURE_SEARCH_INDEX}</Text>
-            <Separator>Konfiguracija</Separator>
-            <Label>Jezik sustava</Label><Text>{infoData?.TARGET_LANGUAGE}</Text>
+            <Separator>{t("InfoContent.AzureAIPretraga")}</Separator>
+            <Label>{t("InfoContent.NazivUsluge")}</Label><Text>{infoData?.AZURE_SEARCH_SERVICE}</Text>
+            <Label>{t("InfoContent.NazivIndeksa")}</Label><Text>{infoData?.AZURE_SEARCH_INDEX}</Text>
+            <Separator>{t("InfoContent.Konfiguracija")}</Separator>
+            <Label>{t("InfoContent.JezikSustava")}</Label><Text>{infoData?.TARGET_LANGUAGE}</Text>
         </div>
     );
 };

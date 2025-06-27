@@ -5,6 +5,7 @@ import { Text } from "@fluentui/react";
 import { Options24Filled } from "@fluentui/react-icons";
 
 import styles from "./SettingsButton.module.css";
+import { useTranslation } from "react-i18next";
 
 interface Props {
     className?: string;
@@ -12,10 +13,12 @@ interface Props {
 }
 
 export const SettingsButton = ({ className, onClick }: Props) => {
+    const { t } = useTranslation();
+    
     return (
         <div className={`${styles.container} ${className ?? ""}`} onClick={onClick}>
             <Options24Filled />
-            <Text>{"Prilagodi"}</Text>
+            <Text>{t('Prilagodi')}</Text>
         </div>
     );
 };

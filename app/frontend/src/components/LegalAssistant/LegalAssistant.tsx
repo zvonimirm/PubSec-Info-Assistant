@@ -1,5 +1,5 @@
 import { FilePicker } from "../../components/filepicker/file-picker";
-
+import { useTranslation } from "react-i18next";
 import { nanoid } from "nanoid";
 import { useCallback, useEffect, useMemo, useState } from "react"; 
 
@@ -13,6 +13,7 @@ interface Props {
 
 
 const LegalAssistant = ({onEvent}: Props) => {
+    const { t } = useTranslation();
     const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined);
     const [selectedTags, setSelectedTags] = useState<string[] | undefined>(undefined);
     const [isClickable, setIsClickable] = useState(false);
@@ -47,7 +48,7 @@ const LegalAssistant = ({onEvent}: Props) => {
                 <div className={styles.actionsStyles}>
                      <span className={`${!isClickable ? styles.btnDisabled : styles.btnStyle}`} onClick={handleSummaryClick}>
                         <p className={styles.exampleText}>
-                            Generiranje sažetka dokumenata
+                            {t("LegalAssistant.SummaryGeneration")}
                         </p>
                     </span>
                     {/* <span className={`${!isClickable ? styles.btnDisabled : styles.btnStyle}`} onClick={handleBlobStorage}>
@@ -57,7 +58,7 @@ const LegalAssistant = ({onEvent}: Props) => {
                     </span> */}
                     <span className={`${!isClickable ? styles.btnDisabled : styles.btnStyle}`} onClick={handleDecisionProposal}>
                         <p className={styles.exampleText}>
-                            Generiranje prijedloga odluke
+                            {t("LegalAssistant.DecisionProposalGeneration")}
                         </p>
                     </span>
                 </div> 

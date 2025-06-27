@@ -4,7 +4,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator, Toggle, Label } from "@fluentui/react";
 import Switch from 'react-switch';
-import { GlobeFilled, BuildingMultipleFilled, AddFilled, ChatSparkleFilled } from "@fluentui/react-icons";
+import { GlobeFilled, BuildingMultipleFilled, AddFilled, ChatSparkleFilled, DocumentBulletListFilled, CommunicationPersonFilled} from "@fluentui/react-icons";
 import { ITag } from '@fluentui/react/lib/Pickers';
 
 import styles from "./Chat.module.css";
@@ -15,6 +15,8 @@ import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, get
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
+import { OdlukeOdboraExampleList } from "../../components/Example/OdlukeOdboraExampleList";
+import { InterniAktiExampleList } from "../../components/Example/InterniAktiExampleList";
 import { UserChatMessage } from "../../components/UserChatMessage";
 import { AnalysisPanel, AnalysisPanelTabs } from "../../components/AnalysisPanel";
 import { SettingsButton } from "../../components/SettingsButton";
@@ -30,13 +32,21 @@ import React from "react";
 import * as mammoth from "mammoth";
 import { LegalAssistantEntry } from "../../components/LegalAssistant/LegalAssistantEntry";
 import {LegalAssistant} from "../../components/LegalAssistant/LegalAssistant";
-
+import { useTranslation } from "react-i18next";
+import { useNavigate, useLocation } from "react-router-dom";
+import InternalActsIcon from '../../assets/interni-akti.svg';
+import LegalAiIcon from '../../assets/legal-AI.svg';
+import { LegalDisclaimer } from "../../components/LegalDisclaimer/LegalDisclaimer";
+import { LegalDisclaimerButton } from "../../components/LegalDisclaimerButton/LegalDisclaimerButton";
 
 
 const Chat = () => {
+    const { t } = useTranslation();
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
     const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
+    const [isLegalDisclaimerOpen, setLegalDisclaimerOpen] = useState(false);
     const [retrieveCount, setRetrieveCount] = useState<number>(10);
+    const location = useLocation();
     const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
     const [userPersona, setUserPersona] = useState<string>("analyst");
     const [systemPersona, setSystemPersona] = useState<string>("an Assistant");
@@ -77,8 +87,9 @@ const Chat = () => {
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
     const [isLAEntryPointVisible, setAssistentEntryPointVisible] = useState(true);
+    const [isIAEntryPointVisible, setIAEntryPointVisible] = useState(true);
     const [fileHtmlDisplay, setFileHtmlDisplay] = useState("");
-
+    const [filterDirectory, setFilterDirectory] = useState<string>("All");
     async function fetchFeatureFlags() {
         try {
             const fetchedFeatureFlags = await getFeatureFlags();
@@ -88,9 +99,14 @@ const Chat = () => {
             console.log(error);
         }
     }
+    useEffect(() => {fetchFeatureFlags()}, []);
 
     const handleLegalAssistantEntryClick = () => {
+        console.log("handleLegalAssistantEntryClick");
         setAssistentEntryPointVisible(false);
+        setIAEntryPointVisible(false);
+        console.log("isLAEntryPointVisible: ", isLAEntryPointVisible);
+        console.log("isIAEntryPointVisible: ", isIAEntryPointVisible);
     }
 
 
@@ -98,6 +114,7 @@ const Chat = () => {
                                 work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 thought_chain: { [key: string]: string },
+                                topic_directory?: string,
                                 display_question?: string) => {
         lastQuestionRef.current = question;
         lastQuestionWorkCitationRef.current = work_citation_lookup;
@@ -111,8 +128,13 @@ const Chat = () => {
         setActiveCitation(undefined);
         setActiveAnalysisPanelTab(undefined);
 
+        const work_directory = selectedFolders.includes("selectAll") ? "All" : selectedFolders.length == 0 ? "All" : selectedFolders.join(",");
+
         try {
             const display_question_text = display_question || question;
+            const work_directory_combine = topic_directory || work_directory;
+            console.log("work_directory_combine: ", work_directory_combine);
+            
             const history: ChatTurn[] = answers.map(a => ({ user: a[0], bot: a[1].answer }));
             const request: ChatRequest = {
                 history: [...history, { user: question, bot: undefined }],
@@ -129,10 +151,12 @@ const Chat = () => {
                     aiPersona: "",
                     responseLength: responseLength,
                     responseTemp: responseTemp,
-                    selectedFolders: selectedFolders.includes("selectAll") ? "All" : selectedFolders.length == 0 ? "All" : selectedFolders.join(","),
-                    selectedTags: selectedTags.map(tag => tag.name).join(",")
+                    selectedFolders: work_directory_combine,
+                    selectedTags: selectedTags.map(tag => tag.name).join(","),
+                    language: localStorage.getItem("lang") ?? undefined
                 },
-                citation_lookup: approach == Approaches.CompareWebWithWork ? web_citation_lookup : approach == Approaches.CompareWorkWithWeb ? work_citation_lookup : {},
+                // citation_lookup: approach == Approaches.CompareWebWithWork ? web_citation_lookup : approach == Approaches.ReadRetrieveRead ? work_citation_lookup : {},
+                citation_lookup:  work_citation_lookup,
                 thought_chain: thought_chain
             };
 
@@ -279,6 +303,28 @@ const Chat = () => {
 
     useEffect(() => {fetchFeatureFlags()}, []);
     useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [isLoading]);
+    
+    useEffect(() => {
+        console.log("IAEntryPointVisible UE: ", isIAEntryPointVisible);
+        console.log("LAEntryPointVisible UE: ", isLAEntryPointVisible);
+        console.log("FilterDirectory: ", filterDirectory);
+    }, [isIAEntryPointVisible, isLAEntryPointVisible, filterDirectory]); 
+
+    useEffect(() => {
+        if (location.state?.source === "IA") {
+            setIAEntryPointVisible(true);
+            setAssistentEntryPointVisible(false);
+            setFilterDirectory("InternalActs");
+        } else if (location.state?.source === "LA") {
+            setIAEntryPointVisible(false);
+            setAssistentEntryPointVisible(true);
+            setFilterDirectory("VSRH");   
+        } else {
+            setIAEntryPointVisible(false);
+            setAssistentEntryPointVisible(true);
+            setFilterDirectory("All");
+        }
+      }, [location]); 
 
     const onRetrieveCountChange = (_ev?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
         setRetrieveCount(parseInt(newValue || "5"));
@@ -297,13 +343,28 @@ const Chat = () => {
     };
 
     const onExampleClicked = (example: string) => {
-        makeApiRequest(example, defaultApproach, {}, {}, {});
+        if (isLAEntryPointVisible) {  
+            console.log("MakeApiRequest 1");
+            makeApiRequest(example, Approaches.ReadRetrieveRead, {}, {}, {}, "VSRH", "");
+        }
+        else if (isIAEntryPointVisible) {
+            console.log("MakeApiRequest 2");
+            makeApiRequest(example, Approaches.ReadRetrieveRead, {}, {}, {}, "InternalActs", "");
+        }
+        else 
+            console.log("MakeApiRequest 3");
+            makeApiRequest(example, defaultApproach, {}, {}, {});
+            // makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.DocumentSummary, {}, {}, {}, "", diplay_question);
+
     };
 
     const onShowCitation = (citation: string, citationSourceFile: string, citationSourceFilePageNumber: string, index: number) => {
         if (activeCitation === citation && activeAnalysisPanelTab === AnalysisPanelTabs.CitationTab && selectedAnswer === index) {
             setActiveAnalysisPanelTab(undefined);
         } else {
+
+            console.log("citation: ", citation);
+            console.log("citationSourceFile: ", citationSourceFile);
             setActiveCitation(citation);
             setActiveCitationSourceFile(citationSourceFile);
             setActiveCitationSourceFilePageNumber(citationSourceFilePageNumber);
@@ -462,20 +523,19 @@ const Chat = () => {
         let content = '';
         content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
     
-        let diplay_question = `Generiram sažetak dokumenta: ${files[0].file.name}`;
-        makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.DocumentSummary, {}, {}, {}, diplay_question);
-       
+        let diplay_question =  `${t("Chat.GeneratingSummary-Display")} ${files[0].file.name}`;
+            console.log("MakeApiRequest 4");
+        makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.DocumentSummary, {}, {}, {}, "", diplay_question);
     };
-
-
     //Generiraj prijedlog odluke
     const handleDecisionProposal = async (text: string, files: any) => {
         let content = '';
     
         content = await GetText(files, content, readTextFromFile, readTextFromDocxFile);
     
-        let diplay_question = `Generiram prijedlog odluke na temelju učitanog dokumenta: ${files[0].file.name} i ostalih sličnih dokumenata u sustavu`;
-        makeApiRequest(`Generiraj mi prijedlog odluke na tužbu: ${content}`, Approaches.DecisionProposal, {}, {}, {}, diplay_question);
+        let diplay_question = `${t("Chat.DecisionDisplayMessage_1")} ${files[0].file.name} ${t("Chat.DecisionDisplayMessage_2")}`;
+            console.log("MakeApiRequest 5");
+        makeApiRequest(`${t("Chat.DecisionRequest")} ${content}`, Approaches.DecisionProposal, {}, {}, {}, "", diplay_question);
         
     };
     const handleLegalAssistantAction = (text: string, files: any) => {
@@ -494,7 +554,8 @@ const Chat = () => {
     const handleDecisionProposalClicked = (question: string, approach: Approaches, work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } }, web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } }, thought_chain: { [key: string]: string }) => {
         let diplay_question = `Generiram prijedlog odluke na temelju učitanog dokumenta i ostalih sličnih dokumenata u sustavu`;
         question= "Generiraj mi prijedlog odluke na tužbu: " + lastQuestionRef.current;
-        makeApiRequest(question, Approaches.DecisionProposal, work_citation_lookup, web_citation_lookup, thought_chain, diplay_question);
+            console.log("MakeApiRequest 6");
+        makeApiRequest(question, Approaches.DecisionProposal, work_citation_lookup, web_citation_lookup, thought_chain, "", diplay_question);
     };
 
     return (
@@ -505,28 +566,47 @@ const Chat = () => {
                     <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={!lastQuestionRef.current || isLoading} />
                     <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
                     <InfoButton className={styles.commandButton} onClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)} />
+                    <LegalDisclaimerButton className={styles.commandButton} onClick={() => setLegalDisclaimerOpen(!isLegalDisclaimerOpen)} />
                 </div>
             </div>
             <div className={styles.chatRoot}>
             
-            {isLAEntryPointVisible && <div className={styles.chatContainer}>
+            {(isLAEntryPointVisible || isIAEntryPointVisible )&& <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div>
                             <div className={styles.chatEmptyState}>
                                 {activeChatMode == ChatMode.WorkOnly ? 
                                     <div>
-                                        <div className={styles.chatEmptyStateHeader}> 
-                                            <BuildingMultipleFilled fontSize={"100px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work Data logo" />
+                                        <>
+                                            <div className={styles.chatEmptyStateHeader}> 
+                                                <>
+                                                    {isLAEntryPointVisible &&  <img src={LegalAiIcon} alt="Legal AI" className={styles.iconStyle}/>}
+                                                    {isIAEntryPointVisible &&  <img src={InternalActsIcon} alt="Internal Acts" className={styles.iconStyle}/>}
+                                                </>
                                             </div>
-                                        <h1 className={styles.chatEmptyStateTitle}>Pitajte informacije o odlukama VSRH</h1>
+
+
+                                            <>
+                                    </> 
+                                            {(isLAEntryPointVisible) && <h1 className={styles.chatEmptyStateTitle}>{t("Chat.HeaderTextLA")}</h1>}
+                                            {(isIAEntryPointVisible) && <h1 className={styles.chatEmptyStateTitle}>{t("Chat.HeaderTextIA")}</h1>}
+                                        </>
                                     </div>
+                                : activeChatMode == ChatMode.WorkPlusWeb && activeApproach == Approaches.Introduction ?
+                                     <div>
+                                         <div className={styles.introductionChatStyle}> 
+                                             <BuildingMultipleFilled fontSize={"80px"} primaryFill={"rgb(118, 74, 239)"} aria-hidden="true" aria-label="Chat with your Work and Web Data logo" /><AddFilled fontSize={"50px"} primaryFill={"rgba(0, 0, 0, 0.7)"} aria-hidden="true" aria-label=""/><GlobeFilled fontSize={"80px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="" />
+                                         </div>
+                                         <h1 className={styles.chatEmptyStateTitle}>Chat with your work and web data</h1>
+                                     </div>
                                 : activeChatMode == ChatMode.WorkPlusWeb ?
                                     <div>
                                         <div className={styles.chatEmptyStateHeader}> 
-                                            <BuildingMultipleFilled fontSize={"80px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work and Web Data logo" /><AddFilled fontSize={"50px"} primaryFill={"rgba(0, 0, 0, 0.7)"} aria-hidden="true" aria-label=""/><GlobeFilled fontSize={"80px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="" />
+                                            <BuildingMultipleFilled fontSize={"80px"} primaryFill={"rgba(188, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work and Web Data logo" /><AddFilled fontSize={"50px"} primaryFill={"rgba(0, 0, 0, 0.7)"} aria-hidden="true" aria-label=""/><GlobeFilled fontSize={"80px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="" />
                                         </div>
                                         <h1 className={styles.chatEmptyStateTitle}>Chat with your work and web data</h1>
                                     </div>
+                                
                                 : //else Ungrounded
                                     <div>
                                         <div className={styles.chatEmptyStateHeader}> 
@@ -536,18 +616,21 @@ const Chat = () => {
                                     </div>
                                 }
                                 <span className={styles.chatEmptyObjectives}>
-                                    <i>Legal AI koristi umjetnu inteligenciju.   </i>
+                                    <i>{t("Chat.AI")}</i>
                                 </span>
                                 {activeChatMode != ChatMode.Ungrounded &&
                                     <div>
-                                        <h2 className={styles.chatEmptyStateSubtitle}>Postavite pitanje ili probajte primjere</h2>
-                                        <ExampleList onExampleClicked={onExampleClicked} />
+                                        <h2 className={styles.chatEmptyStateSubtitle}>{t("Chat.AskQuestion")}</h2>
+                                        
+                                        {isIAEntryPointVisible && <ExampleList onExampleClicked={onExampleClicked} topic="IA" />}
+                                        {isLAEntryPointVisible && <ExampleList onExampleClicked={onExampleClicked} topic="LA" />}
+
                                     </div>
                                 }
                                 
                             </div>
                         <div className={styles.legalEntryStyle}>
-                           <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantEntryClick}/>
+                           {isLAEntryPointVisible && <LegalAssistantEntry onLegalAssistantEntryClicked={handleLegalAssistantEntryClick}/>}
                         </div>
                         </div>
 
@@ -588,7 +671,7 @@ const Chat = () => {
                                 <>
                                     <UserChatMessage message={lastQuestionRef.current} approach={activeApproach}/>
                                     <div className={styles.chatMessageGptMinWidth}>
-                                        <AnswerError error={error.toString()} onRetry={() => makeApiRequest(lastQuestionRef.current, activeApproach, lastQuestionWorkCitationRef.current, lastQuestionWebCitiationRef.current, lastQuestionThoughtChainRef.current)} />
+                                    <AnswerError error={error.toString()} onRetry={() => makeApiRequest(lastQuestionRef.current, activeApproach, lastQuestionWorkCitationRef.current, lastQuestionWebCitiationRef.current, lastQuestionThoughtChainRef.current)} />
                                     </div>
                                 </>
                             ) : null}
@@ -599,8 +682,12 @@ const Chat = () => {
                     <div className={styles.chatInput}>
                         {activeChatMode == ChatMode.WorkPlusWeb && (
                             <div className={styles.chatInputWarningMessage}> 
-                                {defaultApproach == Approaches.ReadRetrieveRead && 
-                                    <div>Questions will be answered by default from Work <BuildingMultipleFilled fontSize={"20px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Work Data" /></div>}
+                                {defaultApproach == Approaches.ReadRetrieveRead && (
+                                    <>
+                                       isLAEntryPointVisible && <div>Questions will be answered by default from Work <BuildingMultipleFilled fontSize={"20px"} primaryFill={"rgb(74, 239, 203)"} aria-hidden="true" aria-label="Work Data" /></div>
+                                       isIAEntryPointVisible && <div>Questions will be answered by default from Work <DocumentBulletListFilled fontSize={"20px"} primaryFill={"rgb(58, 211, 58)"} aria-hidden="true" aria-label="Work Data" /></div>
+                                    </> 
+                                )}
                                 {defaultApproach == Approaches.ChatWebRetrieveRead && 
                                     <div>Questions will be answered by default from Web <GlobeFilled fontSize={"20px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="Web Data" /></div>
                                 }
@@ -608,9 +695,9 @@ const Chat = () => {
                         )}
                         <QuestionInput
                             clearOnSend
-                            placeholder="Upišite pitanje"
+                            placeholder={t('Question.Input.UpisitePitanje')}
                             disabled={isLoading}
-                            onSend={question => makeApiRequest(question, defaultApproach, {}, {}, {})}
+                            onSend={question => makeApiRequest(question, defaultApproach, {}, {}, {}, filterDirectory, "")}
                             onAdjustClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
                             onInfoClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)}
                             showClearChat={true}
@@ -621,30 +708,30 @@ const Chat = () => {
                 </div>
             }
             {
-                !isLAEntryPointVisible &&
+                (!isLAEntryPointVisible && !isIAEntryPointVisible) &&
                     <LegalAssistant onEvent = {handleLegalAssistantAction} />
             }
-                {answers.length > 0 && activeAnalysisPanelTab && (
-                    <AnalysisPanel
-                        className={styles.chatAnalysisPanel}
-                        activeCitation={activeCitation}
-                        sourceFile={activeCitationSourceFile}
-                        pageNumber={activeCitationSourceFilePageNumber}
-                        onActiveTabChanged={x => onToggleTab(x, selectedAnswer)}
-                        citationHeight="850px"
-                        answer={answers[selectedAnswer][1]}
-                        activeTab={activeAnalysisPanelTab}
-                        izvorniDokument={fileHtmlDisplay}
-                    />
-                )}
+            {answers.length > 0 && activeAnalysisPanelTab && (
+                <AnalysisPanel
+                    className={styles.chatAnalysisPanel}
+                    activeCitation={activeCitation}
+                    sourceFile={activeCitationSourceFile}
+                    pageNumber={activeCitationSourceFilePageNumber}
+                    onActiveTabChanged={x => onToggleTab(x, selectedAnswer)}
+                    citationHeight="850px"
+                    answer={answers[selectedAnswer][1]}
+                    activeTab={activeAnalysisPanelTab}
+                    izvorniDokument={fileHtmlDisplay}
+                />
+            )}
 
                 <Panel
-                    headerText="Postavke generiranja odgovora"
+                    headerText={t("Chat.ConfigPanel")}
                     isOpen={isConfigPanelOpen}
                     isBlocking={false}
                     onDismiss={() => setIsConfigPanelOpen(false)}
                     closeButtonAriaLabel="Close"
-                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Zatvori</DefaultButton>}
+                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>{t("Chat.Close")}</DefaultButton>}
                     isFooterAtBottom={true}
                 >
                     {activeChatMode == ChatMode.WorkPlusWeb &&
@@ -660,7 +747,7 @@ const Chat = () => {
                     {activeChatMode != ChatMode.Ungrounded &&
                         <SpinButton
                             className={styles.chatSettingsSeparator}
-                            label="Dohvati ovoliko dokumenata iz pretrage:"
+                            label={t("Chat.RetrieveCount")}
                             min={1}
                             max={50}
                             defaultValue={retrieveCount.toString()}
@@ -671,33 +758,46 @@ const Chat = () => {
                         <Checkbox
                             className={styles.chatSettingsSeparator}
                             checked={useSuggestFollowupQuestions}
-                            label="Predloži dodatna pitanja"
+                            label={t("Chat.FollowUpQuestions")}
                             onChange={onUseSuggestFollowupQuestionsChange}
                         />
                     }
-                    <TextField className={styles.chatSettingsSeparator} defaultValue={userPersona} label="Korisnička persona" onChange={onUserPersonaChange} />
-                    <TextField className={styles.chatSettingsSeparator} defaultValue={systemPersona} label="Persona sustava" onChange={onSystemPersonaChange} />
+                    <TextField className={styles.chatSettingsSeparator} defaultValue={userPersona} label={t("Chat.UserPersona")} onChange={onUserPersonaChange} />
+                    <TextField className={styles.chatSettingsSeparator} defaultValue={systemPersona} label={t("Chat.SystemPersona")} onChange={onSystemPersonaChange} />
                     <ResponseLengthButtonGroup className={styles.chatSettingsSeparator} onClick={onResponseLengthChange} defaultValue={responseLength} />
                     <ResponseTempButtonGroup className={styles.chatSettingsSeparator} onClick={onResponseTempChange} defaultValue={responseTemp} />
                     {activeChatMode != ChatMode.Ungrounded &&
                         <div>
-                            <Separator className={styles.chatSettingsSeparator}>Filtriraj rezultate po:</Separator>
+                            <Separator className={styles.chatSettingsSeparator}>{t("Chat.FilterResults")}</Separator>
                             <FolderPicker allowFolderCreation={false} onSelectedKeyChange={onSelectedKeyChanged} preSelectedKeys={selectedFolders} />
                             <TagPickerInline allowNewTags={false} onSelectedTagsChange={onSelectedTagsChange} preSelectedTags={selectedTags} />
                         </div>
                     }
                 </Panel>
-
+                
                 <Panel
-                    headerText="Informacije o aplikaciji"
+                    headerText={t("Chat.InfoPanel")}
                     isOpen={isInfoPanelOpen}
                     isBlocking={false}
                     onDismiss={() => setIsInfoPanelOpen(false)}
                     closeButtonAriaLabel="Close"
-                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsInfoPanelOpen(false)}>Zatvori</DefaultButton>}
+                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsInfoPanelOpen(false)}>{t("Chat.Close")}</DefaultButton>}
                     isFooterAtBottom={true}                >
                     <div className={styles.resultspanel}>
                         <InfoContent />
+                    </div>
+                </Panel>
+
+                <Panel
+                    headerText={t("LegalDisclaimer.Title")}
+                    isOpen={isLegalDisclaimerOpen}
+                    isBlocking={false}
+                    onDismiss={() => setLegalDisclaimerOpen(false)}
+                    closeButtonAriaLabel="Close"
+                    onRenderFooterContent={() => <DefaultButton onClick={() => setLegalDisclaimerOpen(false)}>{t("Chat.Close")}</DefaultButton>}
+                    isFooterAtBottom={true}                >
+                    <div className={styles.resultspanel}>
+                        <LegalDisclaimer />
                     </div>
                 </Panel>
             </div>
@@ -706,6 +806,7 @@ const Chat = () => {
 };
 
 export default Chat;
+
 async function GetText(files: any, content: string, readTextFromFile: (files: any) => Promise<string>, readTextFromDocxFile: (file: any) => Promise<string>) {
     
     if (files[0].file.name.endsWith('.txt')) {

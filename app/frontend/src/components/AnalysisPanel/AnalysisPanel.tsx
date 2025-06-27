@@ -11,9 +11,10 @@ import ReactMarkdown from 'react-markdown';
 import styles from "./AnalysisPanel.module.css";
 
 import { SupportingContent } from "../SupportingContent";
-import { ChatResponse, ActiveCitation, getCitationObj, fetchCitationFile, FetchCitationFileResponse } from "../../api";
+import { ChatResponse, ActiveCitation, getCitationObj, fetchCitationFile, fetchTranslatedFile, FetchCitationFileResponse } from "../../api";
 import { AnalysisPanelTabs } from "./AnalysisPanelTabs";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
     className: string;
@@ -29,18 +30,21 @@ interface Props {
 
 const pivotItemDisabledStyle: React.CSSProperties = {
     color: 'grey'
-    
+
 };
 
 export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, pageNumber, citationHeight, className, onActiveTabChanged, izvorniDokument }: Props) => {
-    
+
     const [innerPivotTab, setInnerPivotTab] = useState<string>('indexedFile');
     const [activeCitationObj, setActiveCitationObj] = useState<ActiveCitation>();
     const [markdownContent, setMarkdownContent] = useState('');
     const [plainTextContent, setPlainTextContent] = useState('');
     const [sourceFileBlob, setSourceFileBlob] = useState<Blob>();
+    const [translatedFileBlob, setTranslatedFileBlob] = useState<Blob>();
     const [sourceFileUrl, setSourceFileUrl] = useState<string>('');
+    const [translatedFileUrl, setTranslatedFileUrl] = useState<string>('');
     const [isFetchingSourceFileBlob, setIsFetchingSourceFileBlob] = useState(false);
+    const [isFetchingTranslatedFileBlob, setIsFetchingTranslatedFileBlob] = useState(false);
     const isDisabledThoughtProcessTab: boolean = !answer.thoughts;
     const isDisabledSupportingContentTab: boolean = !answer.data_points?.length;
     const isDisabledCitationTab: boolean = !activeCitation;
@@ -51,7 +55,8 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
     const tooltipRef2 = React.useRef<ITooltipHost>(null);
     const tooltipRef3 = React.useRef<ITooltipHost>(null);
     const [htmlContent, setHtmlContent] = useState(izvorniDokument);
-    
+    const [originalFileUrl, setOriginalFileUrl] = useState("");
+
     const onRenderItemLink = (content: string | JSX.Element | JSX.Element[] | undefined, tooltipRef: IRefObject<ITooltipHost> | undefined, shouldRender: boolean) => (properties: IPivotItemProps | undefined,
         nullableDefaultRenderer?: (props: IPivotItemProps) => JSX.Element | null) => {
             if (!properties || !nullableDefaultRenderer) {
@@ -65,33 +70,85 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                 nullableDefaultRenderer(properties)
             );
     };
-    
+    const isOriginalDocumentVisible = () => {
+        console.log(izvorniDokument);
+        if (izvorniDokument) {
+            return true; }
+            else {
+                return false;
+        }
+    };
     let sourceFileBlobPromise: Promise<void> | null = null;
     async function fetchCitationSourceFile(): Promise<void> {
         if (sourceFile) {
+            // console.log("fetching source file -" + sourceFile);
             const results = await fetchCitationFile(sourceFile);
             setSourceFileBlob(results.file_blob);
             setSourceFileUrl(URL.createObjectURL(results.file_blob));
         }
     }
 
-    function getCitationURL() {
-        const fetchSourceFileBlob = async () => {
-            if (sourceFileBlob === undefined) {
-                if (!isFetchingSourceFileBlob) {
-                    setIsFetchingSourceFileBlob(true);
-                    sourceFileBlobPromise = fetchCitationSourceFile().finally(() => {
-                        setIsFetchingSourceFileBlob(false);
-                    });
-                }
-                await sourceFileBlobPromise;
-            }
-        };
-        fetchSourceFileBlob();
-        return sourceFileUrl;
+    let translatedFileBlobPromise: Promise<void> | null = null;
+    async function fetchTranslatedSourceFile(): Promise<void> {
+        if (sourceFile) {
+            // console.log("fetching translated file -" + sourceFile);
+            const results = await fetchTranslatedFile("upload/VSRH/090216ba80ef589f.pdf");
+            setTranslatedFileBlob(results.file_blob);
+            setTranslatedFileUrl(URL.createObjectURL(results.file_blob)); 
+        }
     }
+    
+    
+    
+    function getCitationURL() {
+        return originalFileUrl; 
+    }
+    
+    function getTranslatedDocument() {
+        return translatedFileUrl; 
+    }
+   useEffect(() => {
+    const fetchSourceFileBlob = async () => {
+        console.log("fetching source file blob");
 
-   
+        if (sourceFileBlob === undefined) {
+            if (!isFetchingSourceFileBlob) {
+                setIsFetchingSourceFileBlob(true);
+                sourceFileBlobPromise = fetchCitationSourceFile().finally(() => {
+                    setIsFetchingSourceFileBlob(false);
+                });
+            }
+            await sourceFileBlobPromise;
+        }
+        setOriginalFileUrl(sourceFileUrl); // ✅ Update state in useEffect, not in a render function
+    };
+
+    fetchSourceFileBlob();
+}, [sourceFileBlob, sourceFileUrl, isFetchingSourceFileBlob]);
+
+
+    useEffect(() => {
+    const fetchTranslatedFileBlob = async () => {
+        console.log("fetching translated file blob");
+        if (sourceFileBlob === undefined) {
+            if (!isFetchingSourceFileBlob) {
+                setIsFetchingSourceFileBlob(true);
+                translatedFileBlobPromise = fetchTranslatedSourceFile().finally(() => {
+                    setIsFetchingTranslatedFileBlob(false);
+                });
+            }
+            await translatedFileBlobPromise;
+        }
+        setTranslatedFileUrl(translatedFileUrl); // ✅ Update state in useEffect, not in a render function
+    };
+
+    fetchTranslatedFileBlob();
+}, [translatedFileBlob, translatedFileUrl, isFetchingTranslatedFileBlob]);
+
+
+
+
+
     async function fetchActiveCitationObj() {
         try {
             const citationObj = await getCitationObj(activeCitation as string);
@@ -131,7 +188,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                 console.error('Error fetching plain text content:', error);
             }
         };
-    
+
         if (["json", "txt", "xml"].includes(sourceFileExt)) {
             fetchPlainTextContent();
         }
@@ -143,7 +200,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
         }
         fetchActiveCitationObj();
         const fetchSourceFileBlob = async () => {
-            
+
                 if (!isFetchingSourceFileBlob) {
                     setIsFetchingSourceFileBlob(true);
                     sourceFileBlobPromise = fetchCitationSourceFile().finally(() => {
@@ -151,12 +208,27 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                     });
                 }
                 await sourceFileBlobPromise;
-            
+
         };
+        const fetchTranslatedFileBlob = async () => {
+
+            if (!isFetchingTranslatedFileBlob) {
+                setIsFetchingSourceFileBlob(true);
+                translatedFileBlobPromise = fetchTranslatedSourceFile().finally(() => {
+                    setIsFetchingTranslatedFileBlob(false);
+                });
+            }
+            await fetchTranslatedFileBlob;
+
+    };
         fetchSourceFileBlob();
-        
+        fetchTranslatedFileBlob();
+
     }, [activeCitation]);
-    
+
+
+    const { t } = useTranslation();
+
 
     return (
         <Pivot
@@ -166,17 +238,17 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
         >
             <PivotItem
                 itemKey={AnalysisPanelTabs.ThoughtProcessTab}
-                headerText="Proces razmišljanja"
+                headerText={t("AnalysisPanel.ProcesRazmisljanja")}
                 headerButtonProps={isDisabledThoughtProcessTab ? { disabled: true, style: pivotItemDisabledStyle } : undefined}
-                
+
             >
                 <div className={styles.thoughtProcess} dangerouslySetInnerHTML={{ __html: sanitizedThoughts }}></div>
             </PivotItem>
-            
+
             <PivotItem
                 itemKey={AnalysisPanelTabs.SupportingContentTab}
-                headerText="Prateći sadržaj"
-                
+                headerText={t("AnalysisPanel.PrateciSadrzaj")}
+
                 headerButtonProps={{
                     disabled: isDisabledSupportingContentTab,
                     style: isDisabledSupportingContentTab ?  pivotItemDisabledStyle : undefined,
@@ -185,19 +257,19 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
             >
                 <SupportingContent supportingContent={answer.data_points} />
             </PivotItem>
-            
-            
+
+
             <PivotItem
                 itemKey={AnalysisPanelTabs.CitationTab}
-                
-                headerText="Citati"
+
+                headerText={t("AnalysisPanel.Citati")}
                 headerButtonProps={{
                     disabled: isDisabledCitationTab,
                     style: isDisabledCitationTab ?  pivotItemDisabledStyle : undefined,
                 }}
-                onRenderItemLink = {onRenderItemLink("Nije odabran nijedan citat. Molimo odaberite citat s popisa citata s lijeve strane.", tooltipRef3, isDisabledCitationTab)}
-            > 
-            
+                onRenderItemLink = {onRenderItemLink(t("AnalysisPanel.CitatNijeOdabran"), tooltipRef3, isDisabledCitationTab)}
+            >
+
                 <Pivot className={className} selectedKey={innerPivotTab} onLinkClick={(item) => {
                     if (item) {
                         setInnerPivotTab(item.props.itemKey!);
@@ -206,27 +278,27 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                         console.warn('Item is undefined');
                     }
                 }}>
-                    <PivotItem itemKey="indexedFile" headerText="Odjeljak dokumenta">
+                    <PivotItem itemKey="indexedFile" headerText={t("AnalysisPanel.OdjeljakDokumenta")}>
                         {activeCitationObj === undefined ? (
-                            <Text>Učitavanje...</Text>
-                        ) : 
+                            <Text>{t("AnalysisPanel.Ucitavanje")}</Text>
+                        ) :
                         (
                             <div>
-                                <Separator>Metapodaci</Separator>
-                                <Label>Ime dokumenta</Label><Text>{activeCitationObj.file_name}</Text>
-                                <Label>Adresa dokumenta</Label><Text>{activeCitationObj.file_uri}</Text>
-                                <Label>Naslov</Label><Text>{activeCitationObj.title}</Text>
-                                <Label>Odjeljak</Label><Text>{activeCitationObj.section}</Text>
-                                <Label>Broj stranica</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
-                                <Label>Broj tokena</Label><Text>{activeCitationObj.token_count}</Text>
-                                <Separator>Sadržaj</Separator>
-                                <Label>Sadržaj</Label><Text>{activeCitationObj.content}</Text>
+                                <Separator>{t("AnalysisPanel.Metapodaci")}</Separator>
+                                <Label>{t("AnalysisPanel.ImeDokumenta")}</Label><Text>{activeCitationObj.file_name}</Text>
+                                <Label>{t("AnalysisPanel.AdresaDokumenta")}</Label><Text>{activeCitationObj.file_uri}</Text>
+                                <Label>{t("AnalysisPanel.Naslov")}</Label><Text>{activeCitationObj.title}</Text>
+                                <Label>{t("AnalysisPanel.Odjeljak")}</Label><Text>{activeCitationObj.section}</Text>
+                                <Label>{t("AnalysisPanel.BrojStranica")}</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
+                                <Label>{t("AnalysisPanel.BrojTokena")}</Label><Text>{activeCitationObj.token_count}</Text>
+                                <Separator>{t("AnalysisPanel.Sadrzaj")}</Separator>
+                                <Label>{t("AnalysisPanel.Sadrzaj")}</Label><Text>{activeCitationObj.content}</Text>
                             </div>
                         )}
                     </PivotItem>
-                    <PivotItem itemKey="rawFile" headerText="Dokument">
+                    <PivotItem itemKey="rawFile" headerText={t("AnalysisPanel.Dokument")}>
                         {getCitationURL() === '' ? (
-                            <Text>Učitavanje...</Text>
+                            <Text>{t("AnalysisPanel.Ucitavanje")}</Text>
                         ) : ["docx", "xlsx", "pptx"].includes(sourceFileExt) ? (
                             // Treat other Office formats like "xlsx" for the Office Online Viewer
                             <iframe title="Source File" src={'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(getCitationURL()) + "&action=embedview&wdStartOn=" + pageNumber} width="100%" height={citationHeight} />
@@ -244,12 +316,16 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                             <iframe title="Source File" src={getCitationURL()} width="100%" height={citationHeight} />
                         )}
                     </PivotItem>
-                    <PivotItem itemKey="izvorniDokument" headerText="Izvorni Dokument">
-                        <iframe title="Izvorni dokument" srcDoc={htmlContent} style={{ backgroundColor: 'white' }} width="100%" height={citationHeight} />
-                    </PivotItem>
+                   {isOriginalDocumentVisible() && <PivotItem itemKey="izvorniDokument" headerText={t("AnalysisPanel.IzvorniDokument")}>
+                        <iframe title={t("AnalysisPanel.IzvorniDokument")} srcDoc={htmlContent} style={{ backgroundColor: 'white' }} width="100%" height={citationHeight} />
+                    </PivotItem>}
+                    {/* <PivotItem itemKey="prijevodDokumenta" headerText={t("AnalysisPanel.PrijevodDokumenta")}>
+                        <object data={getTranslatedDocument()} style={{ border: "none" }} width="100%" height={citationHeight} />
+                    </PivotItem> */}
+                    {/* http://localhost:5000/translate-pdf */}
                 </Pivot>
             </PivotItem>
-            
+
         </Pivot>
     );
 };

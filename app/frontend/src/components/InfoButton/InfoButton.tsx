@@ -4,6 +4,7 @@
 import { Text } from "@fluentui/react";
 import { Info24Regular } from "@fluentui/react-icons";
 import styles from "./InfoButton.module.css";
+import { t } from "i18next";
 
 interface Props {
     className?: string;

@@ -14,8 +14,12 @@ class Approaches(Enum):
     ChatWebRetrieveRead = 4
     CompareWorkWithWeb = 5
     CompareWebWithWork = 6
+    #Legal AI
     DocumentSummary = 7
     DecisionProposal = 8
+    Introduction = 9
+    CreditApproval = 10
+    OdlukeOdbora = 11
 
 class Approach:
     """

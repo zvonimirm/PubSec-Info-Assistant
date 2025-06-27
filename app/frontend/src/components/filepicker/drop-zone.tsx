@@ -4,8 +4,10 @@
 import { array, func } from "prop-types";
 import React from "react";
 import styles from "./drop-zone.module.css";
+import { useTranslation } from "react-i18next";
 
 const Banner = ({ onClick, onDrop }: {onClick: any, onDrop: any}) => {
+  const { t } = useTranslation();
   const handleDragOver = (ev: any) => {
     ev.preventDefault();
     ev.stopPropagation();
@@ -25,9 +27,9 @@ const Banner = ({ onClick, onDrop }: {onClick: any, onDrop: any}) => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <span className={styles.banner_text}>Kliknite za dodavanje</span>
-      <span className={styles.banner_text}>ili</span>
-      <span className={styles.banner_text}>povucite i ispustite datoteke ovdje</span>
+      <span className={styles.banner_text}>{t("DropZone.banner1")}</span>
+      <span className={styles.banner_text}>{t("DropZone.banner2")}</span>
+      <span className={styles.banner_text}>{t("DropZone.banner3")}</span>
     </div>
   );
 };

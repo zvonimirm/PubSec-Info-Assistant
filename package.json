@@ -5,8 +5,10 @@
     "docx": "^9.1.0",
     "dotenv": "^16.4.5",
     "file-saver": "^2.0.5",
+    "i18next": "^24.2.2",
     "mammoth": "^1.8.0",
     "papaparse": "^5.4.1",
+    "react-i18next": "^15.4.1",
     "react-markdown": "^6.0.3",
     "react-sticky": "^6.0.3"
   },

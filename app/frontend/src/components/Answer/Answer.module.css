@@ -14,7 +14,7 @@
     background: rgb(249, 249, 249);
     border-radius: 8px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
-    outline: #1B4AEF solid 1px;
+    outline: #0066CC solid 1px;
 }
 
 .answerContainerWeb {
@@ -34,9 +34,13 @@
 }
 
 .answerContainerUngrounded {
-    padding: 20px;
-    background: transparent;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 1px;
+    padding-bottom: 1px;
     outline: transparent;
+    border-radius: 18px;
+    /* border: rgb(230, 230, 230) solid 1px; */
 }
 
 .warningText {
@@ -57,13 +61,31 @@
 
 .answerLogoWork {
     font-size: 22px;
-    color: #1B4AEF;
+    color: #0066CC;
     white-space: break-spaces;
     word-break: break-word;
     display: flex;
     align-items: center;
 }
+.finlyIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
 
+.answerIntroduction {
+    font-size: 24px;
+    font-family: "Roboto", sans-serif;
+    
+    color: #0066cc;
+    white-space: break-spaces;
+    word-break: break-word;
+    display: flex;
+    align-items: top;
+    flex-direction: row;
+    gap: 8px;
+}
 .answerLogoCompare {
     font-size: 22px;
     color: #ce7b2e;
@@ -91,20 +113,22 @@
 }
 
 .answerText {
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 400;
-    line-height: 22px;
     padding-top: 16px;
     padding-bottom: 16px;
 }
-
+.answerMain{
+    display: flex;
+    flex-direction: row;
+}
 .answerTextUngrounded {
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 22px;
-    padding-top: 16px;
-    padding-bottom: 16px;
-    padding-left: 36px;
+    font-size: 22px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    padding-top: 10px;
+    padding-bottom: 1px;
+    padding-left: 1px;
 }
 
 .selected {
@@ -114,29 +138,91 @@
 .citationLearnMore {
     margin-right: 5px;
     font-weight: 600;
-    line-height: 24px;
 }
-
+.downloadFileContainer{
+    display: flex;
+    justify-content: flex-start; /* Aligns children to the left */
+    margin-left: 0px;
+    padding: 0px;
+    width: 600px;
+    
+}
+.downloadFileBtnContainer{
+    display: flex;
+    justify-content: left; 
+}
 .downloadFile {
-    margin-top: 30px;
+    margin-top: 1px;
     margin-right: 5px;
-    margin-bottom: 45px;
+    margin-bottom: 20px;
+    margin-left: 0px;
     font-weight: 500;
-    line-height: 24px;
+    line-height: 28px;
+    text-align: center;
+    align-content: center;
     border-radius: 4px;
-    background: #dbdbdb;
-    color: #000000;
-    font-size: 17px;
+    background: #00AEE8;
+    color: #ffffff;
+    font-size: 22px;
     cursor: pointer;
     padding-left: 14px;
     padding-right:14px;
-    padding-top: 2px;
-    padding-bottom: 3px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    width: 300px;
+    height: 70px;
+    /* border: #0066CC solid 1px; */
+
+}
+
+.downloadFileLA {
+    margin-top: 1px;
+    margin-right: 5px;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: center;
+    align-content: center;
+    border-radius: 4px;
+    background: #00AEE8;
+    color: #ffffff;
+    font-size: 22px;
+    cursor: pointer;
+    padding-left: 14px;
+    padding-right:14px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    width: 350px;
+    height: 50px;
+
 }
 .downloadFile:hover {
     opacity: 0.8;
-    outline: 2px solid rgb(144, 144, 145);
+    outline: 2px solid rgb(255, 255, 255);
 }
+
+
+.optionLabelStyle {
+    flex-grow: 1;
+    max-width: 1028px;
+    width: 100%;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-right: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* or 'scroll' if you always want the scrollbar to be visible */
+    max-height: calc(100vh - 313px); /* optional, adjust according to your layout */
+    color: rgb(0, 0, 0);
+
+    font-size:20px;
+    font-weight: 500;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+}
+
 
 .citationWork {
     font-weight: 500;
@@ -144,14 +230,16 @@
     text-align: center;
     border-radius: 4px;
     padding: 0px 8px;
-    background: #d1dbfa;
-    color: #123bb6;
+    background: #f0f9ff;
+    color: #00AEE8;
     text-decoration: none;
     cursor: pointer;
 }
 
 .citationWork:hover {
     text-decoration: underline;
+    color: #0066CC; 
+
 }
 
 .citationWeb {
@@ -168,6 +256,7 @@
 
 .citationWeb:hover {
     text-decoration: underline;
+
 }
 
 .citationCompare {
@@ -184,6 +273,7 @@
 
 .citationCompare:hover {
     text-decoration: underline;
+
 }
 
 .followupQuestionsList {
@@ -202,8 +292,11 @@
     text-align: center;
     border-radius: 4px;
     padding: 0px 8px;
-    background: #e8ebfa;
-    color: black;
+    background: e8ebfa;
+    color: black; 
+    /* background: #f0f9ff;
+    color: #00AEE8; */
+
     font-style: italic;
     text-decoration: none;
     cursor: pointer;
@@ -216,6 +309,7 @@
 
 .supContainerWeb:hover {
     text-decoration: underline;
+
 }
 
 .supContainerWork {
@@ -225,6 +319,7 @@
 
 .supContainerWork:hover {
     text-decoration: underline;
+
 }
 
 sup {
@@ -240,8 +335,8 @@ sup {
     min-width: 14px;
     height: 14px;
     border-radius: 3px;
-    background: #d1dbfa;
-    color: #123bb6;
+    background: #f0f9ff;
+    color: #00AEE8;
     text-decoration-color: transparent;
     outline: transparent solid 1px;
     cursor: pointer;

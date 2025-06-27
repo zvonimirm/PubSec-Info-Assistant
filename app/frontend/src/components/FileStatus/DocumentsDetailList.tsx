@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 import { DetailsList, 
     DetailsListLayoutMode, 
@@ -58,6 +59,7 @@ interface Props {
 
 export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) => {
     const itemsRef = useRef(items);
+    const { t } = useTranslation();
 
     const onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
         const newColumns: IColumn[] = columns.slice();
@@ -288,7 +290,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'name',
-            name: 'Naziv',
+            name: t('DocumentsDetailList.Name'),
             fieldName: 'name',
             minWidth: 210,
             maxWidth: 350,
@@ -302,7 +304,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'state',
-            name: 'Status',
+            name: t('DocumentsDetailList.State'),
             fieldName: 'state',
             minWidth: 70,
             maxWidth: 90,
@@ -321,7 +323,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'fileFolder',
-            name: 'Mapa',
+            name: t('DocumentsDetailList.Folder'),
             fieldName: 'fileFolder',
             minWidth: 70,
             maxWidth: 90,
@@ -332,7 +334,7 @@ export const DocumentsDetailList = ({ items, onFilesSorted, onRefresh }: Props) 
         },
         {
             key: 'tags',
-            name: 'Oznake',
+            name: t('DocumentsDetailList.Tags'),
             fieldName: 'tags',
             minWidth: 70,
             maxWidth: 90,

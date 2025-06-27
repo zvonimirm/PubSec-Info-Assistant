@@ -7,7 +7,7 @@ import { animated, useSpring } from "@react-spring/web";
 import styles from "./Answer.module.css";
 import { AnswerIcon } from "./AnswerIcon";
 import { Approaches } from "../../api";
-
+import { useTranslation } from "react-i18next";
 interface AnswerLoadingProps {
     approach: Approaches;
 }
@@ -17,6 +17,7 @@ export const AnswerLoading: React.FC<AnswerLoadingProps> = ({ approach }) => {
         from: { opacity: 0 },
         to: { opacity: 1 }
     });
+    const { t } = useTranslation();
 
     return (
         <animated.div style={{ ...animatedStyles }}>
@@ -24,7 +25,7 @@ export const AnswerLoading: React.FC<AnswerLoadingProps> = ({ approach }) => {
                 <AnswerIcon approach={approach}/>
                 <Stack.Item grow>
                     <p className={approach == Approaches.GPTDirect ? styles.answerTextUngrounded : styles.answerText}>
-                        Generiram odgovor
+                        {t("AnswerLoading.Generating")}
                         <span className={styles.loadingdots} />
                     </p>
                 </Stack.Item>

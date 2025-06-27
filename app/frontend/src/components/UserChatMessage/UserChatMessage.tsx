@@ -13,13 +13,20 @@ interface Props {
 export const UserChatMessage = ({ message, approach }: Props) => {
     return (
         <div className={approach == Approaches.GPTDirect ? styles.containerUngrounded : styles.container}>
-            <div className={approach == Approaches.ChatWebRetrieveRead ? styles.messageweb : (approach == Approaches.ReadRetrieveRead || approach == Approaches.DecisionProposal || approach == Approaches.DocumentSummary ) ? styles.messagework : approach == Approaches.GPTDirect ? styles.messageungrounded : styles.messagecompare}>
+            <div className={approach == Approaches.Introduction ? styles.messageIntroduction : approach == Approaches.ChatWebRetrieveRead ? styles.messageweb : (approach == Approaches.ReadRetrieveRead || approach == Approaches.DecisionProposal || approach == Approaches.DocumentSummary ) ? styles.messagework : approach == Approaches.GPTDirect ? styles.messageungrounded : styles.messagecompare}>
                 {
                 approach == Approaches.ReadRetrieveRead ? 
                     <span style={{ marginRight: '10px' }}><BuildingMultiple20Filled primaryFill={"rgba(255, 255, 225, 1)"}/></span> : 
+                approach == Approaches.Introduction ? 
+                    // <span style={{ marginRight: '10px' }}><Person20Filled primaryFill={"rgb(37, 105, 250)"}/></span> : 
+                    <div className={styles.messageIntroduction}></div>:
                 approach == Approaches.DocumentSummary ? 
                     <span style={{ marginRight: '10px' }}><BuildingMultiple20Filled primaryFill={"rgba(255, 255, 225, 1)"}/></span> :
                 approach == Approaches.DecisionProposal ? 
+                    <span style={{ marginRight: '10px' }}><BuildingMultiple20Filled primaryFill={"rgba(255, 255, 225, 1)"}/></span> :
+                approach == Approaches.CreditApproval ? 
+                    <span style={{ marginRight: '10px' }}><BuildingMultiple20Filled primaryFill={"rgba(255, 255, 225, 1)"}/></span> :
+                approach == Approaches.OdlukeOdbora ? 
                     <span style={{ marginRight: '10px' }}><BuildingMultiple20Filled primaryFill={"rgba(255, 255, 225, 1)"}/></span> :
                 approach == Approaches.ChatWebRetrieveRead ?   
                     <span style={{ marginRight: '10px' }}><GlobeSearch20Filled primaryFill={"rgba(255, 255, 225, 1)"}/></span> :
@@ -30,7 +37,7 @@ export const UserChatMessage = ({ message, approach }: Props) => {
                 //else
                     <div className={styles.messageungroundedheader}><div className={styles.messageungroundedicon}><Person20Filled primaryFill={"rgba(0, 0, 0, 0.35)"}/></div><span className={styles.messageungroundedtext}>You</span></div>
                 }
-                <span className={approach == Approaches.GPTDirect ? styles.userMessageUngrounded : styles.userMessage}>{message}</span>
+                <span className={approach == Approaches.GPTDirect ? styles.userMessageUngrounded : approach == Approaches.Introduction ? styles.userMessageIntroduction : styles.userMessage}>{message}</span>
             </div>
         </div>
     );

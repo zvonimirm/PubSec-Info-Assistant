@@ -1,0 +1,19 @@
+.mainContainer{
+    display: flex;
+    flex-direction: row;
+    align-self: top;
+    padding: 15px;
+    gap: 5px; /* Add space between items */
+}
+.select{
+    background: #dbdbdb;
+    border-radius: 7px;
+    border: none;
+    width: 50px;
+    padding-left: 3px;
+}
+.image{
+    width: 48px;
+    height: 32px;
+    border-radius: 10px;
+}
