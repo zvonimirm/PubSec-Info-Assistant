@@ -1,0 +1,64 @@
+.tableStyle {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 1px;
+    margin-bottom: 20px;
+    
+  }
+  
+  .columnStyle {
+    display: inline;
+    vertical-align: bottom;
+    width: 100%;
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    line-height: 1.5;
+    font-weight: 500;
+    padding-right: 15px;;
+  }
+  .columnStyleFinley{
+    font-size: 35px;
+    font-weight: 500;
+  }
+  .image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 40%; 
+    max-height: 80px;
+  }
+  
+  .textColumn {
+    display: inline;
+    vertical-align: bottom;
+    padding-left: 16px;
+    width: 100%;
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    line-height: 1.5;
+  }
+
+  .columnStyleImageContainer
+  {
+    width: 100px;
+    align-items: left;
+  }
+  .columnStyleContainer {
+    display: flex;
+    flex-direction: column;
+    vertical-align: top;
+    width: 900px;
+  }
+  
+  .rowStyle {
+    display: flex;
+    align-items: center;
+  }
+  .arrowStyle{
+    font-size: 30px;
+    color: #0066cc; 
+    font-weight: 900;
+    align-items: top;
+    /* padding-right: 10px; */
+    margin-right: 10px;
+  }

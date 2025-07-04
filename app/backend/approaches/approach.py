@@ -20,6 +20,7 @@ class Approaches(Enum):
     Introduction = 9
     CreditApproval = 10
     OdlukeOdbora = 11
+    IntroductionSales = 12
 
 class Approach:
     """

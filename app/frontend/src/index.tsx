@@ -13,7 +13,10 @@ import NoPage from "./pages/NoPage";
 import Chat from "./pages/chat/Chat";
 import IntroductionEntry from "./pages/introduction/IntroductionEntry";
 import IntroductionGeneral from "./pages/introduction_general/introduction_general";
+import IntroductionSales from "./pages/introduction_general_zaba/introduction_general_zaba";
 import IntroductionChat from "./pages/introduction/IntroductionChat";
+import IntroductionChatSales from "./pages/introduction/IntroductionChatSales";
+import ElevenLabsMain from "./pages/elevenlabs/ElevenLabsMain";
 import { HeaderProvider } from "./components/HeaderProvider";
 import Content from "./pages/content/Content";
 import Tutor from "./pages/tutor/Tutor";
@@ -49,8 +52,11 @@ export default function App() {
                     <Route path="/" element={<Layout />}>
                         {/* <Route index element={<Chat />} /> */}
                         <Route index element={<IntroductionGeneral />} />
+                        <Route path="/IntroductionSales" element={<IntroductionSales />} />
                         <Route path="/IntroductionChat" element={<IntroductionChat />} />
+                        <Route path="/IntroductionChatSales" element={<IntroductionChatSales />} />
                         <Route path="/IntroductionEntry" element={<IntroductionEntry />} />
+                        <Route path="/ElevenLabsMain" element={<ElevenLabsMain />} />
                         <Route path="/Chat" element={<Chat />} />
                         <Route path="content" element={<Content />} />
                         <Route path="*" element={<NoPage />} />

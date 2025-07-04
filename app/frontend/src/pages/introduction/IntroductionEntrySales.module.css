@@ -1,0 +1,124 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: center;
+    margin-top: 5px;
+    height: 90vh;
+}
+.image{
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vW;
+    object-fit: cover;
+    /* z-index: -1; */
+}
+.initQuestionWrapper {
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    text-align: left;
+    margin-bottom: 2px; 
+    margin-top: 55px;
+    gap: 10px;
+    font-weight: 700;
+
+}
+
+.chatInputWrapper {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-800px);
+    width: 100%;
+    max-width: 1000px; 
+    padding: 12px;
+    transition: top 0.3s ease, bottom 0.3s ease;
+}
+
+
+.chatInputMiddle {
+    top: calc(50% + 170px);
+    transform: translate(-50%, -50%);
+}
+
+
+.chatInputDown {
+    bottom: 30px;
+    transform: translateX(-50%);
+}
+
+
+.chatMessageStream {
+    position: absolute; /* Allows precise placement */
+    top: 80px; /* Adjusts distance from the top */
+    left: 50%;
+    transform: translateX(-50%); 
+    
+    width: 100%;
+    max-width: 1028px; 
+    
+    padding-top: 20px;
+    padding-left: 24px;
+    padding-right: 24px;
+
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: calc(100vh - 313px); 
+    gap: 10px;
+}
+
+
+.introductionMainStyle{
+    /* display: flex; */
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative; 
+    height: 100vh; 
+    justify-content: center; 
+    gap: 10px;
+} 
+
+.buttonContainer{
+    display: flex;
+    position: absolute;
+    top: 71%;
+    left: 230px;
+    justify-content: center;
+    gap: 20px;
+}
+.button {
+    background: linear-gradient(0,#fe9b00, #ffc401);
+    border: solid;
+    border-radius: 52px;
+    color: white;
+    border-width: 6px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 32px;
+    font-weight: 800;
+    font-family: "Roboto", sans-serif;
+    height: 90px;
+    width: 350px;
+    margin: 4px 2px;
+    cursor: pointer;
+    padding: 10px 24px;
+    transition-duration: 0.4s;
+}
+
+.button:hover {
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+}

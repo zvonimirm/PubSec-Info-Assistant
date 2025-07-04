@@ -216,7 +216,7 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
             return "";
         });
     }
-    if (approach == Approaches.GPTDirect || approach == Approaches.Introduction) {
+    if (approach == Approaches.GPTDirect || approach == Approaches.Introduction || approach == Approaches.IntroductionSales) {
         console.log("GPTDirect or Introduction approach");
         console.log(parsedAnswer);
         console.log("PARSED");

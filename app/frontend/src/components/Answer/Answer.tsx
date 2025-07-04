@@ -314,7 +314,17 @@ export const Answer = ({
     const onOdulukeOdbora = (korisnikInfo: string) => {
         console.log(korisnikInfo)
     }
-
+   
+    const onTalkToAgent = (korisnikInfo: string) => {
+        setShowHeader(true);
+        // saveConversationToLocal(korisnikInfo);
+        navigate("/elevenlabs");
+    }
+    const onChatWithAgent = (korisnikInfo: string) => {
+        setShowHeader(true);
+        // saveConversationToLocal(korisnikInfo);
+        navigate("/Chat", { state: { isFirstRedirect: true, korisnikInfo: korisnikInfo, source: "IA" } });
+    }
     const isFinal = (answerHtml: string) => {
         const final = answerHtml.toLowerCase().includes("isfinal:true");
         return final;       
@@ -323,12 +333,12 @@ export const Answer = ({
 
     return (
         <div className={styles.answerMain}>
-        {answer.approach == Approaches.Introduction && <AnswerIcon approach={answer.approach} />}
+        {(answer.approach == Approaches.Introduction || answer.approach == Approaches.IntroductionSales) && <AnswerIcon approach={answer.approach} />}
 
         <Stack className={`${(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary || answer.approach == Approaches.DecisionProposal || answer.approach == Approaches.OdlukeOdbora || answer.approach == Approaches.CreditApproval) ? styles.answerContainerWork :
             answer.approach == Approaches.ChatWebRetrieveRead ? styles.answerContainerWeb :
                 answer.approach == Approaches.CompareWorkWithWeb || answer.approach == Approaches.CompareWebWithWork ? styles.answerContainerCompare :
-                    (answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction) ? styles.answerContainerUngrounded :
+                    (answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction || answer.approach == Approaches.IntroductionSales) ? styles.answerContainerUngrounded :
                         styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
 
             {/* Proces razmišljanja */}
@@ -336,7 +346,8 @@ export const Answer = ({
                 <Stack horizontal horizontalAlign="space-between">
                     {(answer.approach == Approaches.ReadRetrieveRead) && (<AnswerIcon approach={answer.approach} />)}
                     <div>
-                        {answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction &&
+                        {answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction && answer.approach != Approaches.IntroductionSales 
+                         &&
                             <IconButton
                                 style={{ color: "black" }}
                                 iconProps={{ iconName: "Lightbulb" }}
@@ -362,12 +373,12 @@ export const Answer = ({
 
             {/* Vaši poslovni i privatni podaci su zaštićeni */}
             <Stack.Item grow>
-                {(answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction) &&
+                {(answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction && answer.approach != Approaches.IntroductionSales) &&
                     <div className={styles.protectedBanner}>
                         <ShieldCheckmark20Regular></ShieldCheckmark20Regular>{t("Answer.ProtectedData")}
                     </div>
                 }
-                {answer.answer && <div className={(answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction)? styles.answerTextUngrounded : styles.answerText}><ReactMarkdown children={parsedAnswer.answerHtml} rehypePlugins={[rehypeRaw, rehypeSanitize]}></ReactMarkdown></div>}
+                {answer.answer && <div className={(answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction || answer.approach != Approaches.IntroductionSales)? styles.answerTextUngrounded : styles.answerText}><ReactMarkdown children={parsedAnswer.answerHtml} rehypePlugins={[rehypeRaw, rehypeSanitize]}></ReactMarkdown></div>}
                 {!answer.answer && <CharacterStreamer
                     classNames={answer.approach == Approaches.GPTDirect ? styles.answerTextUngrounded : styles.answerText}
                     approach={answer.approach}
@@ -408,6 +419,19 @@ export const Answer = ({
                     </Stack.Item>
                 </div>
             )}
+
+             {(parsedAnswer.approach == Approaches.IntroductionSales && !!parsedAnswer.answerHtml.length && isFinal(answer.answer)) && (
+                <div className={styles.downloadFileContainer}>
+                    <Stack.Item>
+                        <div className={styles.optionLabelStyle}>{t("Answer.ChooseOptionSales")}</div>
+                        <Stack horizontal wrap tokens={{ childrenGap: 2 }} className={styles.downloadFileBtnContainer}>
+                            <div className={styles.downloadFile} onClick={() => onTalkToAgent && onTalkToAgent(parsedAnswer.answerHtml)}> {t("Answer.TalkToAgent")}</div>
+                            <div className={styles.downloadFile} onClick={() => onChatWithAgent && onChatWithAgent(parsedAnswer.answerHtml)}>{t("Answer.ChatWithAgent")}</div>
+                        </Stack>
+                    </Stack.Item>
+                </div>
+            )}
+
             {(parsedAnswer.approach == Approaches.DocumentSummary && !!parsedAnswer.answerHtml.length) && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>

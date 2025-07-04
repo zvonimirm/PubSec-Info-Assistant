@@ -177,7 +177,20 @@
     "LegalDisclaimer.Title": "Legal Disclaimer",
     "LegalDisclaimer.InterniAkti":"Internal acts",
     "LegalDisclaimer.VSRH":"Supreme Court of Croatia",
-    "LegalDisclaimer.VSRHOpis":"All court rulings used in this application are available at the following link"
+    "LegalDisclaimer.VSRHOpis":"All court rulings used in this application are available at the following link",
+
+    "IntroductionSales.Audio": "Call",
+    "IntroductionSales.Chat": "Chat" ,
+
+    "finley-introduction-sales": "***",
+    "finley-introduction-sales2" : "*** 🙂",
+
+    "Question.Input.UpisitePitanjeSales": "",
+
+    "Answer.ChooseOptionSales" : "***",
+    "Answer.TalkToAgent" : "Razgovor s digitalnim agentom",
+    "Answer.ChatWithAgent": "Chat s digitalnim agentom"
+
 
 
 

@@ -18,7 +18,7 @@ export const AnswerIcon: React.FC<AnswerIconProps> = ({ approach }) => {
     if (approach == Approaches.ChatWebRetrieveRead) {
         return <div className={styles.answerLogoWeb}><Globe24Filled primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="Web Answer logo" /> Web</div>;
         }
-    else if (approach == Approaches.Introduction) {
+    else if (approach == Approaches.Introduction || approach == Approaches.IntroductionSales) {
             /*Ovaj dio kontrolira stranu Asistanta. Boja definira boju ikonice.*/
             return <div className={styles.answerIntroduction}><img src={FinleyIcon} alt="Description of image" className={styles.finlyIcon}/></div>;
         }
