@@ -184,13 +184,18 @@
 
     "finley-introduction-sales": "Pozdrav! Ja sam Finley, vaš digitalni prodajni savjetnik.",
     "finley-introduction-sales2" : "Tu sam da vam pomognem pronaći najbolju ponudu 🙂",
-    "finley-introduction-sales3" : "Za početak, možete li mi reći svoje ime i tvrtku u kojoj radite?",
+    "finley-introduction-sales3" : "Za početak, možete li mi reći svoje ime?",
 
     "Question.Input.UpisitePitanjeSales": "",
 
     "Answer.ChooseOptionSales" : "Odaberite koji način vam je draži, razgovor s agentom ili nastavak dopisivanja s agentom",
     "Answer.TalkToAgent" : "Razgovor s agentom",
-    "Answer.ChatWithAgent": "Chat s agentom"
+    "Answer.ChatWithAgent": "Chat s agentom",
+
+
+    "ElevenLabsMain.Start": "Start",
+    "ElevenLabsMain.Stop": "Stop",
+    "ElevenLabsMain.Title": "Razgovor s agentom"
 
 
     

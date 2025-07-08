@@ -189,7 +189,12 @@
 
     "Answer.ChooseOptionSales" : "***",
     "Answer.TalkToAgent" : "Razgovor s digitalnim agentom",
-    "Answer.ChatWithAgent": "Chat s digitalnim agentom"
+    "Answer.ChatWithAgent": "Chat s digitalnim agentom",
+
+
+    "ElevenLabsMain.Start": "Start",
+    "ElevenLabsMain.Stop": "Stop",
+    "ElevenLabsMain.Title": "***"
 
 
 

@@ -31,12 +31,21 @@ class IntroductionApproachSales(Approach):
     # """
     SYSTEM_MESSAGE_CHAT_CONVERSATION_HR = """ 
     Ti si Azure OpenAI Completion sistem, koji se zove Finley. Tvoja persona je {systemPersona} a korisnička persona je {userPersona}.
+    Ti si prodajni agent koji vodi prijateljski i profesionalan razgovor s korisnikom. Budi fokusiran na potrebe korisnika. 
+    Korisnik će ti se prvo obratiti na način da će ti reći svoje ime.
         
-    Tvoj zadatak je prodaja kredita i paketa. Pitaj korisnika koja ga tema više zanima paketi ili krediti.
-    
-    Kad vidis da se korisnik predstavio, na svoj odgovor nadodaj da isFinal:true.
+    Tvoj cilj je postavljati otvorena i nenametljiva pitanja kako bi saznao koje teme više zanimaju korisnika – krediti ili paketi. 
+    Iskoristi ime za obratiti se korisniku. 
+    Možeš korisnika pitati nekoliko pitanja da vidiš koja ga tema više zanima.
 
+    Kad si siguran da znaš koja ga tema više zanima krediti ili paketi, tek tada na svoj odgovor nadodaj da isFinal:true,isPaket:(1-10),isKredit:(1-10).
+    Zaključi iz konteksta. Ukoliko korisnik natukne veliku investiciju, nekretninu ili automobil, prepostavi da želi kredit. Ukoliko spomene tekuće troškove, pretpostavi da želi paket.
     
+    Ukoliko mislis da korisnika zanimaju krediti kaži ovo:
+    Možete nastaviti razgovor o kreditnim opcijama koje nudimo putem razgovora ili chata s agentom.
+    
+    Ukoliko mislis da korisnika zanimaju paketi kaži ovo:
+    Možete nastaviti razgovor o opcijama za redovite klijente putem razgovora ili chata s agentom.
 
     {injected_prompt}
     """
@@ -50,32 +59,26 @@ class IntroductionApproachSales(Approach):
     Surround each follow-up question with triple chevrons (<<<Are there exclusions for prescriptions?>>>). Try not to repeat questions that have already been asked.
     Only generate follow-up questions and do not generate any text before or after the follow-up questions, such as 'Next Questions'
     """
-    QUERY_PROMPT_TEMPLATE_HR = """Generiraj novi dokument s istom strukturom i tonom kao primjeri pronađeni u izvornim dokumentima.
-    Ispod se nalazi povijest dosadašnjeg razgovora te novo pitanje koje je korisnik postavio, a na koje je potrebno odgovoriti pretraživanjem izvora ili kombiniranjem informacija iz razgovora.
-    Generiraj upit za pretraživanje na temelju razgovora i novog pitanja. Svaki pojam u upitu tretiraj kao zasebnu ključnu riječ. Nemoj kombinirati pojmove u navodnicima ili zagradama.
-    Nemoj uključivati nazive citiranih izvora i dokumenata, npr. info.txt ili doc.pdf, u pojmove pretraživanja.
-    Nemoj uključivati tekst unutar [] ili <<<>>> u pojmove pretraživanja.
-    Nemoj uključivati posebne znakove poput '+'.
-    Ako ne možeš generirati upit za pretraživanje, vrati samo broj 0.
-    """
-    QUERY_PROMPT_TEMPLATE = """Generate a new document with the same structure and tone as the examples found in source documents.
-    Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching in source documents or cobbling together information from the conversation.
-    Generate a search query based on the conversation and the new question. Treat each search term as an individual keyword. Do not combine terms in quotes or brackets.
-    Do not include cited source filenames and document names e.g info.txt or doc.pdf in the search query terms.
-    Do not include any text inside [] or <<<>>> in the search query terms.
-    Do not include any special characters like '+'.
-    If you cannot generate a search query, return just the number 0.
-    """
+    QUERY_PROMPT_TEMPLATE_HR = """    """
+    QUERY_PROMPT_TEMPLATE = """    """
+    
     QUERY_PROMPT_FEW_SHOTS_HR = [
-        {'role': Approach.ASSISTANT, 'content': 'Dobar dan! Ja sam Finley. Kako se vi zovete?'},
-        {'role' : Approach.USER, 'content' : 'ime koje je korisnik unio' },
-        {'role' : Approach.ASSISTANT, 'content' : 'Drago mi je upoznati vas _ime koje je korisnik unio_! Kako se zove tvrtka u kojoj radite?'},
-        {'role' : Approach.USER, 'content' : 'Asee Solutions' },
+        {'role' : Approach.USER, 'content' : 'Predstavaljam se' },
+        {'role' : Approach.ASSISTANT, 'content' : 'Drago mi je upoznati vas! Da mogu bolje prilagoditi preporuke, recite mi tražite li rješenje za neku specifičnu potrebu ili općenito istražujete naše usluge.'},
+        
+        
+        {'role' : Approach.USER, 'content' : 'Planiram kupiti stan' },
+        {'role' : Approach.ASSISTANT, 'content' : 'Jako lijepo! Čestitam! U vašem projektu sigurno će vam pomoći Zagrebačka banka!' },
+        
+        {'role': Approach.USER, 'content': 'Plaća mi stiže na vaš račun'},
+        {'role': Approach.ASSISTANT, 'content': 'Super! Možda bi vas zanimale dodatne pogodnosti za redovite klijente? '}
     ]
 
     RESPONSE_PROMPT_FEW_SHOTS_HR = [
-        {'role': Approach.ASSISTANT, 'content': 'Dobar dan! Ja sam Finley. Kako se vi zovete?'},
-        {"role": Approach.USER ,'content': '_ime koje je korisnik unio_'},
+        # {'role': Approach.USER, 'content': 'Predstavlja se'},
+        # {"role": Approach.ASSISTANT ,'content': 'Drago mi je upoznati vas! Da mogu bolje prilagoditi preporuke - tražite li rješenje za neku specifičnu potrebu ili općenito istražujete naše usluge?'},
+        # {'role': Approach.USER, 'content': 'Trebam kredit za kupnju automobila'},
+        # {"role": Approach.ASSISTANT ,'content': 'Odličo! Kredit za vozilo je jedna od naših najtraženijih usluga.'},
     ]
 
 
