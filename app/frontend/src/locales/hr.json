@@ -183,7 +183,7 @@
     "IntroductionSales.Chat": "Chat s agentom", 
 
     "finley-introduction-sales": "Pozdrav! Ja sam Finley, vaš digitalni prodajni savjetnik.",
-    "finley-introduction-sales2" : "Tu sam da vam pomognem pronaći najbolju ponudu 🙂",
+    "finley-introduction-sales2" : "Tu sam da vam pomognem pronaći najbolju ponudu. 🙂",
     "finley-introduction-sales3" : "Za početak, možete li mi reći svoje ime?",
 
     "Question.Input.UpisitePitanjeSales": "",
@@ -193,9 +193,9 @@
     "Answer.ChatWithAgent": "Chat s agentom",
 
 
-    "ElevenLabsMain.Start": "Start",
-    "ElevenLabsMain.Stop": "Stop",
-    "ElevenLabsMain.Title": "Razgovor s agentom"
+    "ElevenLabsMain.Start": "Pozovi",
+    "ElevenLabsMain.Stop": "Prekini",
+    "ElevenLabsMain.Title": "Razgovaraj s agentom"
 
 
     

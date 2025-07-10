@@ -17,6 +17,7 @@ const IntroductionChaSales = () => {
     
     const [defaultApproach, setDefaultApproach] = useState<number>(Approaches.IntroductionSales);
     const [activeApproach, setActiveApproach] = useState<number>(Approaches.IntroductionSales);
+    const [salesTypeApproach, setSalesTypeApproach] = useState<number>(Approaches.IntroductionSales);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [activeCitation, setActiveCitation] = useState<string>();
     const [activeAnalysisPanelTab, setActiveAnalysisPanelTab] = useState<AnalysisPanelTabs | undefined>(undefined);
@@ -36,6 +37,8 @@ const IntroductionChaSales = () => {
     const lastQuestionThoughtChainRef = useRef<{ [key: string]: string }>({});
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
     const [selectedAnswer, setSelectedAnswer] = useState<number>(0);
+    type salesType = 'Kredit' | 'Paket';
+    type communicationType = 'Chat' | 'Talk';
 
     const makeApiRequest = async (question: string, approach: Approaches, 
                                     work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
@@ -108,6 +111,7 @@ const IntroductionChaSales = () => {
                 setIsLoading(false);
             }
     };
+    const navigate = useNavigate();
     
     const [hasRun, setHasRun] = useState<boolean>(false);
     const location = useLocation();
@@ -117,10 +121,46 @@ const IntroductionChaSales = () => {
         setAnswers(newItems);
     }
 
+    const salesDecision = (response: string) => {
+        console.log("response: " + response);
+        let currentSalesType = 'Kredit';
+        if(answerContains(response, "isKredit")){
+            console.log("Answer conatins: isKredit");
+            setSalesTypeApproach(getCurrentApproach(response))
+            currentSalesType = getSalesType(response);
+        }
+        
+        let commType = ""
+        console.log("IsTalk: " + answerContains(response, "isTalk") + " salesTypeApproach:" + salesTypeApproach)
+        if(answerContains(response, "isTalk") && salesTypeApproach != Approaches.IntroductionSales){
+            const communicationType = getCommunicationType(response);
+            commType = communicationType;
+
+            console.log("Communication type: " + communicationType);
+
+            if(communicationType === 'Talk')
+            {
+                console.log("REDIRECT TO ELEVEN LABS - " + currentSalesType);
+                setTimeout(() => {
+                    console.log("Izvršava se nakon 2 sekunde");
+                    navigate("/ElevenLabsMain" , {state: {salesType: currentSalesType}});
+                }, 3000); // 2 sekunde
+            }
+            else{
+            //    setActiveApproach(salesTypeApproach);
+                console.log(salesTypeApproach);
+            }
+        }
+
+        const currentApproach = getCurrentApproach(answers[answers.length - 1]?.[1].answer);
+        console.log("Trenutni approach je: " + currentApproach)
+    }
+
     const updateAnswerAtIndex = (index: number, response: ChatResponse) => {
         setAnswers(currentAnswers => {
             const updatedAnswers = [...currentAnswers];
             updatedAnswers[index] = [updatedAnswers[index][0], response];
+            salesDecision(response.answer);
             return updatedAnswers;
         });
     }
@@ -131,15 +171,80 @@ const IntroductionChaSales = () => {
         console.log("initQuestionVisible updated:", initQuestionVisible);
     }, [initQuestionVisible]);
 
+    const getCommunicationType = (answer: string): communicationType => {
+      if (!answer) return 'Chat';
 
+        const talkMatch = answer.match(/isTalk\s*:\s*(\d+)/);
+        const chatMatch = answer.match(/isChat\s*:\s*(\d+)/);
+
+        const talkValue = talkMatch ? parseInt(talkMatch[1], 10) : 0;
+        const chatValue = chatMatch ? parseInt(chatMatch[1], 10) : 0;
+
+        // Ako oba nisu prisutna, ili nisu brojevi, default
+        if (talkValue === 0 && chatValue === 0) {
+            return 'Chat';
+        }
+        console.log("talk value: " + talkValue + " chat value: " + chatValue);
+    return talkValue > chatValue
+        ? 'Talk'
+        : 'Chat';
+    }
+    
+    const getSalesType = (answer: string | undefined): salesType => {
+        if (!answer) return 'Kredit';
+
+        const kreditMatch = answer.match(/isKredit\s*:\s*(\d+)/);
+        const paketMatch = answer.match(/isPaket\s*:\s*(\d+)/);
+
+        const isKredit = kreditMatch ? parseInt(kreditMatch[1], 10) : 0;
+        const isPaket = paketMatch ? parseInt(paketMatch[1], 10) : 0;
+        console.log("kredit value: " + isKredit + " paket value: " + isPaket);
+
+        // Ako oba nisu prisutna, ili nisu brojevi, default
+        if (isKredit === 0 && isPaket === 0) {
+            return 'Kredit'
+        }
+
+        return isKredit > isPaket
+        ? 'Kredit'
+        : 'Paket';
+    }
+    function getCurrentApproach(answer: string | undefined): Approaches {
+        if (!answer) return Approaches.IntroductionSales;
+
+        const kreditMatch = answer.match(/isKredit\s*:\s*(\d+)/);
+        const paketMatch = answer.match(/isPaket\s*:\s*(\d+)/);
+
+        const isKredit = kreditMatch ? parseInt(kreditMatch[1], 10) : 0;
+        const isPaket = paketMatch ? parseInt(paketMatch[1], 10) : 0;
+        console.log("kredit value: " + isKredit + " paket value: " + isPaket);
+
+        // Ako oba nisu prisutna, ili nisu brojevi, default
+        if (isKredit === 0 && isPaket === 0) {
+            return Approaches.IntroductionSales;
+        }
+
+    return isKredit > isPaket
+        ? Approaches.GPTDirect
+        : Approaches.IntroductionSales;
+    }
+    
+    function answerContains(answer: string, keyword: string): boolean {
+        if (!answer || answer.length === 0) {
+             return false;
+            }
+        return answer.toLowerCase().includes(keyword.toLowerCase());
+    }
+   
     const onQuestionSend = (question: string) => {
-        console.log("Before setting state:", initQuestionVisible);
+      
         makeApiRequest(question, defaultApproach, {}, {}, {});
         setInitQuestionVisible(false);
         console.log("After setting state:", initQuestionVisible);
     };
 
     const { t } = useTranslation();
+
 
     return (
         <div className={styles.container}>

@@ -217,11 +217,11 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
         });
     }
     if (approach == Approaches.GPTDirect || approach == Approaches.Introduction || approach == Approaches.IntroductionSales) {
-        console.log("GPTDirect or Introduction approach");
-        console.log(parsedAnswer);
-        console.log("PARSED");
-        const parsedRegex = parsedAnswer.replace(/\bisFinal:true\b/gi, "").trim();
-        console.log(parsedRegex);
+        // console.log("GPTDirect or Introduction approach");
+        // console.log(parsedAnswer);
+        // console.log("PARSED");
+        const parsedRegex = parsedAnswer.replace(/\bisFinal:true\b/gi, "").replace(/\bisKreddit:(10|[1-9])\b/gi, "").replace(/\bisPadet:(10|[1-9])\b/gi, "").trim();
+        // console.log(parsedRegex);
         fragments.push(parsedRegex);
     }
     

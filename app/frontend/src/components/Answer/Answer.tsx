@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun } from "docx";
+import { useState } from 'react';
 import { saveAs } from "file-saver";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -80,6 +81,14 @@ export const Answer = ({
         return paragraphs;
     }
 
+
+    // const [agentSalesType, setAgentSalesType ] = useState<salesType>('Kredit');
+   
+    // useEffect(() => {
+    //     console.log("useEffect: ")
+    //     console.log(agentSalesType)
+    // }, [agentSalesType]);
+    
     const getFirstNCitattiLines = (answerHtml: string, keywords: string[] = ["CITATI", "CITATIONS"]): string[] => {
         // Razdvajamo tekst na linije
         const lines = answerHtml.split("\n");
@@ -315,11 +324,9 @@ export const Answer = ({
         console.log(korisnikInfo)
     }
    
-    const onTalkToAgent = (korisnikInfo: string) => {
-        setShowHeader(true);
-        // saveConversationToLocal(korisnikInfo);
-        navigate("/elevenlabs");
-    }
+    
+
+  
     const onChatWithAgent = (korisnikInfo: string) => {
         setShowHeader(true);
         // saveConversationToLocal(korisnikInfo);
@@ -422,14 +429,14 @@ export const Answer = ({
 
              {(parsedAnswer.approach == Approaches.IntroductionSales && !!parsedAnswer.answerHtml.length && isFinal(answer.answer)) && (
                 <div className={styles.downloadFileContainer}>
-                    <Stack.Item>
-                        <div className={styles.optionLabelStyle}>{t("Answer.ChooseOptionSales")}</div>
-                        <Stack horizontal wrap tokens={{ childrenGap: 2 }} className={styles.downloadFileBtnContainer}>
-                            <div className={styles.downloadFile} onClick={() => onTalkToAgent && onTalkToAgent(parsedAnswer.answerHtml)}> {t("Answer.TalkToAgent")}</div>
-                            <div className={styles.downloadFile} onClick={() => onChatWithAgent && onChatWithAgent(parsedAnswer.answerHtml)}>{t("Answer.ChatWithAgent")}</div>
-                        </Stack>
-                    </Stack.Item>
-                </div>
+                {/*     <Stack.Item>
+                //         <div className={styles.optionLabelStyle}>{t("Answer.ChooseOptionSales")}</div>
+                //         <Stack horizontal wrap tokens={{ childrenGap: 2 }} className={styles.downloadFileBtnContainer}>
+                //             <div className={styles.downloadFile} onClick={() => onTalkToAgent && onTalkToAgent(parsedAnswer.answerHtml)}> {t("Answer.TalkToAgent")}</div>
+                //             <div className={styles.downloadFile} onClick={() => onChatWithAgent && onChatWithAgent(parsedAnswer.answerHtml)}>{t("Answer.ChatWithAgent")}</div>
+                //         </Stack>
+                     </Stack.Item>(*/}
+                 </div>
             )}
 
             {(parsedAnswer.approach == Approaches.DocumentSummary && !!parsedAnswer.answerHtml.length) && (
