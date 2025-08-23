@@ -20,7 +20,9 @@ export const enum Approaches {
     Introduction = 9,
     CreditApproval = 10,
     OdlukeOdbora = 11,
-    IntroductionSales = 12
+    IntroductionSales = 12,
+    SalesKrediti = 13,
+    SalesPaketi = 14
 }
 
 export type ChatRequestOverrides = {

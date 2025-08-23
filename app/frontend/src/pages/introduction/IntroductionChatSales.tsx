@@ -9,12 +9,12 @@ import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { UserChatMessage } from "../../components/UserChatMessage";
 import { IntroductionInitQuestionSales } from "../../components/Introduction/IntroductionInitQuestionSales";
 import { useTranslation } from "react-i18next";
-
+import { useSearchParams } from 'react-router-dom';
 
 const IntroductionChaSales = () => {
     
    
-    
+    const [searchParams, setSearchParams] = useSearchParams();
     const [defaultApproach, setDefaultApproach] = useState<number>(Approaches.IntroductionSales);
     const [activeApproach, setActiveApproach] = useState<number>(Approaches.IntroductionSales);
     const [salesTypeApproach, setSalesTypeApproach] = useState<number>(Approaches.IntroductionSales);
@@ -40,6 +40,47 @@ const IntroductionChaSales = () => {
     type salesType = 'Kredit' | 'Paket';
     type communicationType = 'Chat' | 'Talk';
 
+    const [name, setName] = useState('');
+    const [sales_type, setSalesType] = useState('');
+    const [account_bundle, setAccountBundle] = useState('');
+    const [isFirstQuestion, setIsFirstQuestion] = useState(true);
+
+useEffect(() => {
+    if (chatMessageStreamEnd.current) {
+        chatMessageStreamEnd.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'end' 
+        });
+    }
+}, [answers]);
+
+    useEffect(() => {
+        // Scroll na dno kad god se promijeni broj poruka
+        if (chatMessageStreamEnd.current) {
+            chatMessageStreamEnd.current.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'end' 
+            });
+        }
+    }, [answers.length]);
+
+    useEffect(() => {
+        const nameParam = searchParams.get('name') || '';
+        const salesTypeParam = searchParams.get('sales_type') || '';
+        const accountBundleParam = searchParams.get('account_bundle') || '';
+
+        setName(nameParam);
+        setSalesType(salesTypeParam);
+        setAccountBundle(accountBundleParam);
+ 
+        
+    }, [searchParams]); 
+    
+    useEffect(() => {
+         setDefaultApproach(salesTypeApproach);
+         setActiveApproach(salesTypeApproach);
+     }, [salesTypeApproach]);
+
     const makeApiRequest = async (question: string, approach: Approaches, 
                                     work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                     web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
@@ -56,8 +97,9 @@ const IntroductionChaSales = () => {
             setIsLoading(true);
             setActiveCitation(undefined);
             setActiveAnalysisPanelTab(undefined);
-    
+            console.log("makeApirequest: " + approach);
             try {
+                
                 const display_question_text = display_question || question;
                 const history: ChatTurn[] = answers.map(a => ({ user: a[0], bot: a[1].answer }));
                 const request: ChatRequest = {
@@ -111,6 +153,7 @@ const IntroductionChaSales = () => {
                 setIsLoading(false);
             }
     };
+    
     const navigate = useNavigate();
     
     const [hasRun, setHasRun] = useState<boolean>(false);
@@ -122,45 +165,59 @@ const IntroductionChaSales = () => {
     }
 
     const salesDecision = (response: string) => {
-        console.log("response: " + response);
-        let currentSalesType = 'Kredit';
-        if(answerContains(response, "isKredit")){
-            console.log("Answer conatins: isKredit");
-            setSalesTypeApproach(getCurrentApproach(response))
-            currentSalesType = getSalesType(response);
-        }
-        
+       
         let commType = ""
-        console.log("IsTalk: " + answerContains(response, "isTalk") + " salesTypeApproach:" + salesTypeApproach)
-        if(answerContains(response, "isTalk") && salesTypeApproach != Approaches.IntroductionSales){
+        console.log("IsTalk: " + answerContains(response, "isTalk") + " salesTypeApproach:" + salesTypeApproach + "sales type: " + sales_type);
+        console.log("response: " + response);
+        if(answerContains(response, "isTalk")){
             const communicationType = getCommunicationType(response);
             commType = communicationType;
 
             console.log("Communication type: " + communicationType);
+            
+            let currentApproach = getCurrentApproachFromParameter(sales_type);
+            console.log(`CurrentApproach from sales decision: ${currentApproach}`);
+            setSalesTypeApproach(currentApproach);
+            
+            let currentSalesType = getCurrentSalesType(sales_type);
 
             if(communicationType === 'Talk')
             {
-                console.log("REDIRECT TO ELEVEN LABS - " + currentSalesType);
+                console.log("REDIRECT TO ELEVEN LABS - currentSalesType, nameParam, accountBundle: " + currentSalesType + ", " + name + ", " + account_bundle);
                 setTimeout(() => {
-                    console.log("Izvršava se nakon 2 sekunde");
-                    navigate("/ElevenLabsMain" , {state: {salesType: currentSalesType}});
-                }, 3000); // 2 sekunde
+                    console.log("Izvršava se nakon 3.5 sekunde");
+                    navigate("/ElevenLabsMain" , {state: {salesType: currentSalesType, nameParam: name, accountBundle: account_bundle}});
+                }, 3500); 
             }
             else{
-            //    setActiveApproach(salesTypeApproach);
-                console.log(salesTypeApproach);
+                 console.log("Active approach je: " + activeApproach);
+                console.log("Default approach je: " + defaultApproach);
+                console.log("Sales Type approach je: " + salesTypeApproach);
             }
         }
-
-        const currentApproach = getCurrentApproach(answers[answers.length - 1]?.[1].answer);
-        console.log("Trenutni approach je: " + currentApproach)
+       
     }
-
+    const addUserNameToLastAnswer = (message: string) => {
+        setAnswers(currentAnswers => {
+            const updatedAnswers = [...currentAnswers];
+            const lastIndex = updatedAnswers.length - 1;
+            
+            if (lastIndex >= 0 && updatedAnswers[lastIndex][1]) {
+                const lastResponse = updatedAnswers[lastIndex][1];
+                updatedAnswers[lastIndex][1] = {
+                    ...lastResponse,
+                    answer: `${message}}`
+                };
+            }
+        return updatedAnswers;
+    });
+}
     const updateAnswerAtIndex = (index: number, response: ChatResponse) => {
         setAnswers(currentAnswers => {
             const updatedAnswers = [...currentAnswers];
             updatedAnswers[index] = [updatedAnswers[index][0], response];
             salesDecision(response.answer);
+            console.log("answee:" + response.answer);
             return updatedAnswers;
         });
     }
@@ -209,6 +266,40 @@ const IntroductionChaSales = () => {
         ? 'Kredit'
         : 'Paket';
     }
+
+    function getCurrentApproachFromParameter(parameter: string | undefined): Approaches {
+        if (!parameter) return Approaches.SalesKrediti;
+
+        const lowerParam = parameter.toLowerCase();
+
+        if (lowerParam.includes("kredit")) {
+            return Approaches.SalesKrediti;
+        }
+
+        if (lowerParam.includes("paket")) {
+            return Approaches.SalesPaketi;
+        }
+
+        return Approaches.SalesKrediti;
+    }
+
+     function getCurrentSalesType(parameter: string | undefined): salesType {
+        if (!parameter) return 'Kredit';
+
+        const lowerParam = parameter.toLowerCase();
+
+        if (lowerParam.includes("kredit")) {
+            return 'Kredit';
+        }
+
+        if (lowerParam.includes("paket")) {
+            return 'Paket';
+        }
+
+        return 'Kredit';
+    }
+
+
     function getCurrentApproach(answer: string | undefined): Approaches {
         if (!answer) return Approaches.IntroductionSales;
 
@@ -225,8 +316,8 @@ const IntroductionChaSales = () => {
         }
 
     return isKredit > isPaket
-        ? Approaches.GPTDirect
-        : Approaches.IntroductionSales;
+        ? Approaches.SalesKrediti
+        : Approaches.SalesPaketi;
     }
     
     function answerContains(answer: string, keyword: string): boolean {
@@ -237,8 +328,25 @@ const IntroductionChaSales = () => {
     }
    
     const onQuestionSend = (question: string) => {
-      
-        makeApiRequest(question, defaultApproach, {}, {}, {});
+        
+        let displayQestion = question;
+        let sendingQuestion = question;
+        let additionalInformation = "";
+
+        console.log("onQuestionSend Active approach je: " + activeApproach);
+        console.log("onQuestionSend Default approach je: " + defaultApproach);
+        console.log("onQuestionSend Sales Type approach je: " + salesTypeApproach);
+    
+        if (isFirstQuestion) {
+            if(sales_type.toLowerCase() === 'paket')
+                additionalInformation =  `. Moje ime je ${name}. Želim razgovorati o paketima. Trenutno koristim ${account_bundle.toUpperCase()} paket.`;
+            else
+                additionalInformation = `. Moje ime je ${name}. Želim razgovarati o kreditima.`;
+            sendingQuestion = question + additionalInformation;
+            setIsFirstQuestion(false);
+        }
+        console.log(`Sending question: ${sendingQuestion}`);
+        makeApiRequest(sendingQuestion, defaultApproach, {}, {}, {}, displayQestion);
         setInitQuestionVisible(false);
         console.log("After setting state:", initQuestionVisible);
     };
@@ -250,11 +358,13 @@ const IntroductionChaSales = () => {
         <div className={styles.container}>
              {initQuestionVisible && (
                 <div className={styles.initQuestionWrapper}>
-                    <IntroductionInitQuestionSales />
+                    <IntroductionInitQuestionSales 
+                        name={name}
+                        salesType={sales_type} />
                 </div>
             )}
            
-           <div className={`${styles.chatInputWrapper} ${initQuestionVisible ? styles.chatInputMiddle : styles.chatInputDown}`}>
+           <div className={`${styles.chatInputWrapperSales} ${initQuestionVisible ? styles.chatInputMiddle : styles.chatInputDown}`}>
                 <QuestionInput
                     clearOnSend
                     placeholder={t('Question.Input.UpisitePitanjeSales')}

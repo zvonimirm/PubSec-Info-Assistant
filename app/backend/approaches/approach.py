@@ -21,6 +21,8 @@ class Approaches(Enum):
     CreditApproval = 10
     OdlukeOdbora = 11
     IntroductionSales = 12
+    SalesKrediti = 13
+    SalesPaketi = 14
 
 class Approach:
     """

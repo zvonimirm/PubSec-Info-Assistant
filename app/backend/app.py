@@ -22,6 +22,8 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile, Form
 from fastapi.responses import RedirectResponse, StreamingResponse
 from approaches.introduction_approcach import IntroductionApproach
 from approaches.introduction_approcach_sales import IntroductionApproachSales
+from approaches.sales_approach_krediti import SalesKrediti
+from approaches.sales_approach_paketi import SalesPaketi
 from approaches.credit_approval_approach import CreditApprovalApproach
 from approaches.odluke_odbora_approach import OdlukeOdboraApproach
 from approaches.comparewebwithwork import CompareWebWithWork
@@ -301,6 +303,48 @@ chat_approaches = {
                                     str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
                                 ),
     Approaches.IntroductionSales: IntroductionApproachSales(
+                                    search_client,
+                                    ENV["AZURE_OPENAI_ENDPOINT"],
+                                    ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
+                                    ENV["KB_FIELDS_SOURCEFILE"],
+                                    ENV["KB_FIELDS_CONTENT"],
+                                    ENV["KB_FIELDS_PAGENUMBER"],
+                                    ENV["KB_FIELDS_CHUNKFILE"],
+                                    ENV["AZURE_BLOB_STORAGE_CONTAINER"],
+                                    blob_client,
+                                    ENV["QUERY_TERM_LANGUAGE"],
+                                    MODEL_NAME,
+                                    MODEL_VERSION,
+                                    ENV["TARGET_EMBEDDINGS_MODEL"],
+                                    ENV["ENRICHMENT_APPSERVICE_URL"],
+                                    ENV["TARGET_TRANSLATION_LANGUAGE"],
+                                    ENV["AZURE_AI_ENDPOINT"],
+                                    ENV["AZURE_AI_LOCATION"],
+                                    token_provider,
+                                    str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
+                                ),
+    Approaches.SalesPaketi: SalesPaketi(
+                                    search_client,
+                                    ENV["AZURE_OPENAI_ENDPOINT"],
+                                    ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],
+                                    ENV["KB_FIELDS_SOURCEFILE"],
+                                    ENV["KB_FIELDS_CONTENT"],
+                                    ENV["KB_FIELDS_PAGENUMBER"],
+                                    ENV["KB_FIELDS_CHUNKFILE"],
+                                    ENV["AZURE_BLOB_STORAGE_CONTAINER"],
+                                    blob_client,
+                                    ENV["QUERY_TERM_LANGUAGE"],
+                                    MODEL_NAME,
+                                    MODEL_VERSION,
+                                    ENV["TARGET_EMBEDDINGS_MODEL"],
+                                    ENV["ENRICHMENT_APPSERVICE_URL"],
+                                    ENV["TARGET_TRANSLATION_LANGUAGE"],
+                                    ENV["AZURE_AI_ENDPOINT"],
+                                    ENV["AZURE_AI_LOCATION"],
+                                    token_provider,
+                                    str_to_bool.get(ENV["USE_SEMANTIC_RERANKER"])
+                                ),
+    Approaches.SalesKrediti: SalesKrediti(
                                     search_client,
                                     ENV["AZURE_OPENAI_ENDPOINT"],
                                     ENV["AZURE_OPENAI_CHATGPT_DEPLOYMENT"],

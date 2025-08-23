@@ -592,7 +592,7 @@ const Chat = () => {
                                             {(isIAEntryPointVisible) && <h1 className={styles.chatEmptyStateTitle}>{t("Chat.HeaderTextIA")}</h1>}
                                         </>
                                     </div>
-                                : activeChatMode == ChatMode.WorkPlusWeb && (activeApproach == Approaches.Introduction || activeApproach == Approaches.IntroductionSales) ?
+                                : activeChatMode == ChatMode.WorkPlusWeb && (activeApproach == Approaches.Introduction || activeApproach == Approaches.IntroductionSales || activeApproach == Approaches.SalesPaketi || activeApproach == Approaches.SalesKrediti) ?
                                      <div>
                                          <div className={styles.introductionChatStyle}> 
                                              <BuildingMultipleFilled fontSize={"80px"} primaryFill={"rgb(118, 74, 239)"} aria-hidden="true" aria-label="Chat with your Work and Web Data logo" /><AddFilled fontSize={"50px"} primaryFill={"rgba(0, 0, 0, 0.7)"} aria-hidden="true" aria-label=""/><GlobeFilled fontSize={"80px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="" />

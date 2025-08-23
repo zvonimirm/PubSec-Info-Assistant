@@ -182,20 +182,22 @@
     "IntroductionSales.Audio": "Razgovor s agentom",
     "IntroductionSales.Chat": "Chat s agentom", 
 
-    "finley-introduction-sales": "Pozdrav! Ja sam Finley, vaš digitalni prodajni savjetnik.",
-    "finley-introduction-sales2" : "Tu sam da vam pomognem pronaći najbolju ponudu. 🙂",
-    "finley-introduction-sales3" : "Za početak, možete li mi reći svoje ime?",
+    "finley-introduction-sales": "Pozdrav ###! Ja sam Mia! Javljam se iz e-poslovnice Zagrebačke banke.",
+    "finley-introduction-sales2" : "Želim Vas informirati o mogućnostima financiranja koje Vam može pomoći u otplati vaših troškova ili financiranju vaših budućih planova.",
+    "finley-introduction-sales2b" : "Želim Vas informirati o našim paketima koji Vam nude bolju kontrolu nad financijama i dodatnu sigurnost, a sve to na jednostavan način.",
+    "finley-introduction-sales3" : "Mogu Vas preusmjeriti na poziv s virtualnim agentom ili možete nastaviti dopisivanjem.",
+    "finley-introduction-sales4" : "Koju opciju preferirate?",
 
     "Question.Input.UpisitePitanjeSales": "",
 
-    "Answer.ChooseOptionSales" : "Odaberite koji način vam je draži, razgovor s agentom ili nastavak dopisivanja s agentom",
-    "Answer.TalkToAgent" : "Razgovor s agentom",
-    "Answer.ChatWithAgent": "Chat s agentom",
+    "Answer.ChooseOptionSales" : "Odaberite koji način vam je draži, poziv ili nastavak dopisivanja s virtualnim agentom",
+    "Answer.TalkToAgent" : "Poziv s virtualnim agentom",
+    "Answer.ChatWithAgent": "Dopisivanje s virtualnim agentom",
 
 
     "ElevenLabsMain.Start": "Pozovi",
     "ElevenLabsMain.Stop": "Prekini",
-    "ElevenLabsMain.Title": "Razgovaraj s agentom"
+    "ElevenLabsMain.Title": "Razgovar s virtualnim agentom"
 
 
     

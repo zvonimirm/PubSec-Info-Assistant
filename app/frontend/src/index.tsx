@@ -17,6 +17,7 @@ import IntroductionSales from "./pages/introduction_general_zaba/introduction_ge
 import IntroductionChat from "./pages/introduction/IntroductionChat";
 import IntroductionChatSales from "./pages/introduction/IntroductionChatSales";
 import ElevenLabsMain from "./pages/elevenlabs/ElevenLabsMain";
+import ElevenLabsParams from "./pages/elevenlabs/ElevenLabsParams";
 import { HeaderProvider } from "./components/HeaderProvider";
 import Content from "./pages/content/Content";
 import Tutor from "./pages/tutor/Tutor";
@@ -57,6 +58,7 @@ export default function App() {
                         <Route path="/IntroductionChatSales" element={<IntroductionChatSales />} />
                         <Route path="/IntroductionEntry" element={<IntroductionEntry />} />
                         <Route path="/ElevenLabsMain" element={<ElevenLabsMain />} />
+                        <Route path="/ElevenLabsParams" element={<ElevenLabsParams />} />
                         <Route path="/Chat" element={<Chat />} />
                         <Route path="content" element={<Content />} />
                         <Route path="*" element={<NoPage />} />

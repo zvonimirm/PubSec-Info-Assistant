@@ -8,6 +8,7 @@ import { saveAs } from "file-saver";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 // Add this declaration to extend the Window interface
 declare global {
     interface Window {
@@ -336,16 +337,21 @@ export const Answer = ({
         const final = answerHtml.toLowerCase().includes("isfinal:true");
         return final;       
     }
+
+      const isTalk = (answerHtml: string) => {
+        const final = answerHtml.toLowerCase().includes("istalk");
+        return final;       
+    }
     const { t } = useTranslation();
 
     return (
         <div className={styles.answerMain}>
-        {(answer.approach == Approaches.Introduction || answer.approach == Approaches.IntroductionSales) && <AnswerIcon approach={answer.approach} />}
+        {(answer.approach == Approaches.Introduction || answer.approach == Approaches.IntroductionSales || answer.approach == Approaches.SalesPaketi || answer.approach == Approaches.SalesKrediti) && <AnswerIcon approach={answer.approach} />}
 
         <Stack className={`${(answer.approach == Approaches.ReadRetrieveRead || answer.approach == Approaches.DocumentSummary || answer.approach == Approaches.DecisionProposal || answer.approach == Approaches.OdlukeOdbora || answer.approach == Approaches.CreditApproval) ? styles.answerContainerWork :
             answer.approach == Approaches.ChatWebRetrieveRead ? styles.answerContainerWeb :
                 answer.approach == Approaches.CompareWorkWithWeb || answer.approach == Approaches.CompareWebWithWork ? styles.answerContainerCompare :
-                    (answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction || answer.approach == Approaches.IntroductionSales) ? styles.answerContainerUngrounded :
+                    (answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction || answer.approach == Approaches.IntroductionSales || answer.approach == Approaches.SalesPaketi || answer.approach == Approaches.SalesKrediti) ? styles.answerContainerUngrounded :
                         styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
 
             {/* Proces razmišljanja */}
@@ -353,7 +359,7 @@ export const Answer = ({
                 <Stack horizontal horizontalAlign="space-between">
                     {(answer.approach == Approaches.ReadRetrieveRead) && (<AnswerIcon approach={answer.approach} />)}
                     <div>
-                        {answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction && answer.approach != Approaches.IntroductionSales 
+                        {answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction && answer.approach != Approaches.IntroductionSales && answer.approach != Approaches.SalesKrediti && answer.approach != Approaches.SalesPaketi 
                          &&
                             <IconButton
                                 style={{ color: "black" }}
@@ -380,12 +386,15 @@ export const Answer = ({
 
             {/* Vaši poslovni i privatni podaci su zaštićeni */}
             <Stack.Item grow>
-                {(answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction && answer.approach != Approaches.IntroductionSales) &&
+                {(answer.approach != Approaches.GPTDirect && answer.approach != Approaches.Introduction && answer.approach != Approaches.IntroductionSales && answer.approach != Approaches.SalesKrediti && answer.approach != Approaches.SalesPaketi) &&
                     <div className={styles.protectedBanner}>
                         <ShieldCheckmark20Regular></ShieldCheckmark20Regular>{t("Answer.ProtectedData")}
                     </div>
                 }
-                {answer.answer && <div className={(answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction || answer.approach != Approaches.IntroductionSales)? styles.answerTextUngrounded : styles.answerText}><ReactMarkdown children={parsedAnswer.answerHtml} rehypePlugins={[rehypeRaw, rehypeSanitize]}></ReactMarkdown></div>}
+                {answer.answer && <div className={(answer.approach == Approaches.GPTDirect || answer.approach == Approaches.Introduction || answer.approach == Approaches.IntroductionSales
+                    || answer.approach == Approaches.SalesKrediti
+                    || answer.approach == Approaches.SalesPaketi)
+                ? styles.answerTextUngrounded : styles.answerText}><ReactMarkdown children={parsedAnswer.answerHtml} rehypePlugins={[rehypeRaw, rehypeSanitize]}></ReactMarkdown></div>}
                 {!answer.answer && <CharacterStreamer
                     classNames={answer.approach == Approaches.GPTDirect ? styles.answerTextUngrounded : styles.answerText}
                     approach={answer.approach}
@@ -427,8 +436,9 @@ export const Answer = ({
                 </div>
             )}
 
-             {(parsedAnswer.approach == Approaches.IntroductionSales && !!parsedAnswer.answerHtml.length && isFinal(answer.answer)) && (
+             {((parsedAnswer.approach == Approaches.SalesKrediti || parsedAnswer.approach == Approaches.SalesPaketi || parsedAnswer.approach == Approaches.IntroductionSales)&& !!parsedAnswer.answerHtml.length && isTalk(answer.answer)) && (
                 <div className={styles.downloadFileContainer}>
+                    {/* <WaitingAnimation/> */}
                 {/*     <Stack.Item>
                 //         <div className={styles.optionLabelStyle}>{t("Answer.ChooseOptionSales")}</div>
                 //         <Stack horizontal wrap tokens={{ childrenGap: 2 }} className={styles.downloadFileBtnContainer}>

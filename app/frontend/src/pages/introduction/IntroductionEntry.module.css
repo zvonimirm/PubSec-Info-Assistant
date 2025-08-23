@@ -36,7 +36,18 @@ html, body {
 
 }
 
+
 .chatInputWrapper {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-100px);
+    width: 100%;
+    max-width: 1000px; 
+    padding: 12px;
+    transition: top 0.3s ease, bottom 0.3s ease;
+}
+
+.chatInputWrapperSales {
     position: absolute;
     left: 50%;
     transform: translateX(-100px);
@@ -51,7 +62,10 @@ html, body {
     top: calc(50% + 310px);
     transform: translate(-50%, -50%);
 }
-
+.chatInputMiddleSales {
+    top: calc(50% + 310px);
+    transform: translate(-50%, -50%);
+}
 
 .chatInputDown {
     bottom: 30px;

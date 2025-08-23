@@ -216,11 +216,12 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
             return "";
         });
     }
-    if (approach == Approaches.GPTDirect || approach == Approaches.Introduction || approach == Approaches.IntroductionSales) {
+    if (approach == Approaches.GPTDirect || approach == Approaches.Introduction || approach == Approaches.IntroductionSales || approach == Approaches.SalesKrediti || approach == Approaches.SalesPaketi) {
         // console.log("GPTDirect or Introduction approach");
         // console.log(parsedAnswer);
         // console.log("PARSED");
-        const parsedRegex = parsedAnswer.replace(/\bisFinal:true\b/gi, "").replace(/\bisKreddit:(10|[1-9])\b/gi, "").replace(/\bisPadet:(10|[1-9])\b/gi, "").trim();
+        // const parsedRegex = parsedAnswer.replace(/\bisFinal:true\b/gi, "").replace(/\b,?isKredit:(10|[1-9])\b/gi, "").replace(/\b,?isPaket:(10|[1-9])\b/gi, "").replace(/\bisTalk:(10|[1-9])\b/gi, "").replace(/\bisChat:(10|[1-9])\b/gi, "").trim();
+        const parsedRegex = parsedAnswer.replace(/\bisFinal:true\b/gi, "").replace(/,?\s*(isKredit|isPaket):(10|[1-9])\s*,?/gi, "").replace(/,?\s*(isTalk|isChat):(10|[1-9])\s*,?/gi, "").trim();
         // console.log(parsedRegex);
         fragments.push(parsedRegex);
     }

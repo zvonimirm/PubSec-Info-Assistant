@@ -16,6 +16,7 @@ const CharacterStreamer = ({ eventSource, nonEventString, onStreamingComplete, c
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
   const [dots, setDots] = useState('');
 
+
     const handleStream = async () => {
       try {
         var response = {} as ChatResponse
@@ -54,6 +55,7 @@ const CharacterStreamer = ({ eventSource, nonEventString, onStreamingComplete, c
             }
           }
           if (setAnswer) {
+            console.log("STREAMER: " + approach);
             // We need to set these values in the thought_chain so that the compare works
             if (approach === Approaches.ChatWebRetrieveRead) {
               response.thought_chain["web_response"] = response.answer
@@ -71,6 +73,12 @@ const CharacterStreamer = ({ eventSource, nonEventString, onStreamingComplete, c
               response.thought_chain["ungrounded_response"] = response.answer
             }
             else if (approach === Approaches.IntroductionSales) {
+              response.thought_chain["ungrounded_response"] = response.answer
+            }
+            else if (approach === Approaches.SalesKrediti) {
+              response.thought_chain["ungrounded_response"] = response.answer
+            }
+            else if (approach === Approaches.SalesPaketi) {
               response.thought_chain["ungrounded_response"] = response.answer
             }
             else if (approach === Approaches.CreditApproval) {
