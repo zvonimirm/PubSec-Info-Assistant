@@ -20,6 +20,16 @@ const EXAMPLES_InterniAkti_EN: ExampleModel[] = [
     { text: "What procedures are defined for employees in case of detecting money laundering (AML)?", value: "What procedures are defined for employees in case of detecting money laundering (AML)?" },
     { text: "What are the main internal and regulatory requirements that a bank must meet when approving donations?", value: "What are the main internal and regulatory requirements that a bank must meet when approving donations?" }
 ];
+const EXAMPLES_Graditeljstvo: ExampleModel[] = [
+    { text: "Što sve investitor mora priložiti uz zahtjev za izdavanje uporabne dozvole?", value: "Što sve investitor mora priložiti uz zahtjev za izdavanje uporabne dozvole?" },
+    { text: "Koji su uvjeti za dobivanje građevinske dozvole?", value: "Koji su uvjeti za dobivanje građevinske dozvole?" },
+    { text: "Što prijeti nadzornom inženjeru ako utvrdi da građenje nije u skladu s građevinskom dozvolom?", value: "Što prijeti nadzornom inženjeru ako utvrdi da građenje nije u skladu s građevinskom dozvolom?" }
+];
+const EXAMPLES_Graditeljstvo_EN: ExampleModel[] = [
+    { text: "What must an investor attach to the application for a usage permit?", value: "What must an investor attach to the application for a usage permit?" },
+    { text: "What are the conditions for obtaining a building permit?", value: "What are the conditions for obtaining a building permit?" },
+    { text: "What are the consequences for a supervision engineer if they determine that construction is not in accordance with the building permit?", value: "What are the consequences for a supervision engineer if they determine that construction is not in accordance with the building permit?" }
+];
 const EXAMPLES: ExampleModel[] = [
     { text: "Molio bih primjere revizija odluka županijskih sudova", value: "Molio bih primjere revizija odluka županijskih sudova" },
     { text: "Koji su kriteriji za dopuštanje revizije sudske odluke?", value: "Koji su kriteriji za dopuštanje revizije sudske odluke?" },
@@ -44,6 +54,9 @@ const GetExamples = (topic: string) => {
         else if (topic === "LA") {
             return EXAMPLES;
         }
+        else if (topic === "GRAD") {
+            return EXAMPLES_Graditeljstvo;
+        }
         else {
             return EXAMPLES;
         }
@@ -54,6 +67,9 @@ const GetExamples = (topic: string) => {
             }
             else if (topic === "LA") {
                 return EXAMPLES_EN;
+            }
+            else if (topic === "GRAD") {
+                return EXAMPLES_Graditeljstvo_EN;
             }
             else {
                 return EXAMPLES_EN;

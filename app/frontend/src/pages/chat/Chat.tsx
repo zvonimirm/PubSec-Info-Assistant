@@ -36,6 +36,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
 import InternalActsIcon from '../../assets/interni-akti.svg';
 import LegalAiIcon from '../../assets/legal-AI.svg';
+import GradIcon from '../../assets/grad-icon.png';
 import { LegalDisclaimer } from "../../components/LegalDisclaimer/LegalDisclaimer";
 import { LegalDisclaimerButton } from "../../components/LegalDisclaimerButton/LegalDisclaimerButton";
 
@@ -88,6 +89,7 @@ const Chat = () => {
 
     const [isLAEntryPointVisible, setAssistentEntryPointVisible] = useState(true);
     const [isIAEntryPointVisible, setIAEntryPointVisible] = useState(true);
+    const [isGRADEntryPointVisible, setGRADEntryPointVisible] = useState(false);
     const [fileHtmlDisplay, setFileHtmlDisplay] = useState("");
     const [filterDirectory, setFilterDirectory] = useState<string>("All");
     async function fetchFeatureFlags() {
@@ -105,8 +107,10 @@ const Chat = () => {
         console.log("handleLegalAssistantEntryClick");
         setAssistentEntryPointVisible(false);
         setIAEntryPointVisible(false);
+        setGRADEntryPointVisible(false);
         console.log("isLAEntryPointVisible: ", isLAEntryPointVisible);
         console.log("isIAEntryPointVisible: ", isIAEntryPointVisible);
+        console.log("isGRADEntryPointVisible: ", isGRADEntryPointVisible);
     }
 
 
@@ -307,21 +311,30 @@ const Chat = () => {
     useEffect(() => {
         console.log("IAEntryPointVisible UE: ", isIAEntryPointVisible);
         console.log("LAEntryPointVisible UE: ", isLAEntryPointVisible);
+        console.log("GRADEntryPointVisible UE: ", isGRADEntryPointVisible);
         console.log("FilterDirectory: ", filterDirectory);
-    }, [isIAEntryPointVisible, isLAEntryPointVisible, filterDirectory]); 
+    }, [isIAEntryPointVisible, isLAEntryPointVisible, isGRADEntryPointVisible, filterDirectory]); 
 
     useEffect(() => {
         if (location.state?.source === "IA") {
             setIAEntryPointVisible(true);
             setAssistentEntryPointVisible(false);
+            setGRADEntryPointVisible(false);
             setFilterDirectory("InternalActs");
         } else if (location.state?.source === "LA") {
             setIAEntryPointVisible(false);
             setAssistentEntryPointVisible(true);
+            setGRADEntryPointVisible(false);
             setFilterDirectory("VSRH");   
+        } else if (location.state?.source === "GRAD") {
+            setIAEntryPointVisible(false);
+            setAssistentEntryPointVisible(false);
+            setGRADEntryPointVisible(true);
+            setFilterDirectory("Graditeljstvo");   
         } else {
             setIAEntryPointVisible(false);
             setAssistentEntryPointVisible(true);
+            setGRADEntryPointVisible(false);
             setFilterDirectory("All");
         }
       }, [location]); 
@@ -351,9 +364,14 @@ const Chat = () => {
             console.log("MakeApiRequest 2");
             makeApiRequest(example, Approaches.ReadRetrieveRead, {}, {}, {}, "InternalActs", "");
         }
-        else 
-            console.log("MakeApiRequest 3");
+        else if (isGRADEntryPointVisible) {
+            console.log("MakeApiRequest 3 - GRAD");
+            makeApiRequest(example, Approaches.ReadRetrieveRead, {}, {}, {}, "Graditeljstvo", "");
+        }
+        else {
+            console.log("MakeApiRequest 4");
             makeApiRequest(example, defaultApproach, {}, {}, {});
+        }
             // makeApiRequest(`${content}. Mogu li dobiti sažetak ovog teksta?`, Approaches.DocumentSummary, {}, {}, {}, "", diplay_question);
 
     };
@@ -571,7 +589,7 @@ const Chat = () => {
             </div>
             <div className={styles.chatRoot}>
             
-            {(isLAEntryPointVisible || isIAEntryPointVisible )&& <div className={styles.chatContainer}>
+            {(isLAEntryPointVisible || isIAEntryPointVisible || isGRADEntryPointVisible )&& <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div>
                             <div className={styles.chatEmptyState}>
@@ -582,6 +600,7 @@ const Chat = () => {
                                                 <>
                                                     {isLAEntryPointVisible &&  <img src={LegalAiIcon} alt="Legal AI" className={styles.iconStyle}/>}
                                                     {isIAEntryPointVisible &&  <img src={InternalActsIcon} alt="Internal Acts" className={styles.iconStyle}/>}
+                                                    {isGRADEntryPointVisible &&  <img src={GradIcon} alt="Construction" className={styles.iconStyle}/>}
                                                 </>
                                             </div>
 
@@ -590,6 +609,7 @@ const Chat = () => {
                                     </> 
                                             {(isLAEntryPointVisible) && <h1 className={styles.chatEmptyStateTitle}>{t("Chat.HeaderTextLA")}</h1>}
                                             {(isIAEntryPointVisible) && <h1 className={styles.chatEmptyStateTitle}>{t("Chat.HeaderTextIA")}</h1>}
+                                            {(isGRADEntryPointVisible) && <h1 className={styles.chatEmptyStateTitle}>{t("Chat.HeaderTextGRAD")}</h1>}
                                         </>
                                     </div>
                                 : activeChatMode == ChatMode.WorkPlusWeb && (activeApproach == Approaches.Introduction || activeApproach == Approaches.IntroductionSales || activeApproach == Approaches.SalesPaketi || activeApproach == Approaches.SalesKrediti) ?
@@ -624,6 +644,7 @@ const Chat = () => {
                                         
                                         {isIAEntryPointVisible && <ExampleList onExampleClicked={onExampleClicked} topic="IA" />}
                                         {isLAEntryPointVisible && <ExampleList onExampleClicked={onExampleClicked} topic="LA" />}
+                                        {isGRADEntryPointVisible && <ExampleList onExampleClicked={onExampleClicked} topic="GRAD" />}
 
                                     </div>
                                 }
@@ -684,8 +705,9 @@ const Chat = () => {
                             <div className={styles.chatInputWarningMessage}> 
                                 {defaultApproach == Approaches.ReadRetrieveRead && (
                                     <>
-                                       isLAEntryPointVisible && <div>Questions will be answered by default from Work <BuildingMultipleFilled fontSize={"20px"} primaryFill={"rgb(74, 239, 203)"} aria-hidden="true" aria-label="Work Data" /></div>
-                                       isIAEntryPointVisible && <div>Questions will be answered by default from Work <DocumentBulletListFilled fontSize={"20px"} primaryFill={"rgb(58, 211, 58)"} aria-hidden="true" aria-label="Work Data" /></div>
+                                       {isLAEntryPointVisible && <div>Questions will be answered by default from Work <BuildingMultipleFilled fontSize={"20px"} primaryFill={"rgb(74, 239, 203)"} aria-hidden="true" aria-label="Work Data" /></div>}
+                                       {isIAEntryPointVisible && <div>Questions will be answered by default from Work <DocumentBulletListFilled fontSize={"20px"} primaryFill={"rgb(58, 211, 58)"} aria-hidden="true" aria-label="Work Data" /></div>}
+                                       {isGRADEntryPointVisible && <div>Questions will be answered by default from Work <BuildingMultipleFilled fontSize={"20px"} primaryFill={"rgb(255, 140, 0)"} aria-hidden="true" aria-label="Work Data" /></div>}
                                     </> 
                                 )}
                                 {defaultApproach == Approaches.ChatWebRetrieveRead && 
@@ -708,7 +730,7 @@ const Chat = () => {
                 </div>
             }
             {
-                (!isLAEntryPointVisible && !isIAEntryPointVisible) &&
+                (!isLAEntryPointVisible && !isIAEntryPointVisible && !isGRADEntryPointVisible) &&
                     <LegalAssistant onEvent = {handleLegalAssistantAction} />
             }
             {answers.length > 0 && activeAnalysisPanelTab && (

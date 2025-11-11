@@ -16,6 +16,9 @@ const IntroductionGeneral = () => {
     const onInternalActsClick = () => {
         navigate("/Chat", { state: { isFirstRedirect: true, korisnikInfo: "", source: "IA" } });
     };
+    const onConstructionClick = () => {
+        navigate("/Chat", { state: { isFirstRedirect: true, korisnikInfo: "", source: "GRAD" } });
+    };
 
     const handleLanguageChange = (newLanguage: string) => {
         console.log("Language changed to:", newLanguage);
@@ -27,11 +30,10 @@ const IntroductionGeneral = () => {
     <div className={styles.backgroundContainer}>
         <div className={styles.mainContainer}>
             <div className={styles.holderContainer}></div>
-            <div className={styles.topicContainer} onClick={() => onInternalActsClick()}>
-              <div className={styles.btnContainer}>{t("Answer.InternalActs")}</div>
-            </div>
-            <div className={styles.topicContainer} onClick={() => onRelevantAuthoritiesClick()}>
-              <div className={styles.btnContainer}>{t("Answer.RelevantAuthorities")}</div>
+            <div className={styles.topicContainer}>
+              <div className={styles.btnContainer} onClick={() => onInternalActsClick()}>{t("Answer.InternalActs")}</div>
+              <div className={styles.btnContainer} onClick={() => onRelevantAuthoritiesClick()}>{t("Answer.RelevantAuthorities")}</div>
+              <div className={styles.btnContainer} onClick={() => onConstructionClick()}>{t("Answer.Construction")}</div>
             </div>
             <div className={styles.rightContainer}>
                 <div className={styles.languageContainer}> 

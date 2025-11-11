@@ -309,7 +309,7 @@ export const Answer = ({
     };
     const onSudskeOdlukeClicked = (korisnikInfo: string) => {
         console.log(korisnikInfo);
-        // saveConversationToLocal(korisnikInfo);
+        saveConversationToLocal(korisnikInfo);
         setShowHeader(true);
         navigate("/Chat", { state: { isFirstRedirect: true, korisnikInfo: korisnikInfo, source: "LA" } });
 
@@ -317,8 +317,14 @@ export const Answer = ({
 
     const onInterniAkti = (korisnikInfo: string) => {
         setShowHeader(true);
-        // saveConversationToLocal(korisnikInfo);
+        saveConversationToLocal(korisnikInfo);
         navigate("/Chat", { state: { isFirstRedirect: true, korisnikInfo: korisnikInfo, source: "IA" } });
+    }
+
+    const onGraditeljstvoClicked = (korisnikInfo: string) => {
+        setShowHeader(true);
+        saveConversationToLocal(korisnikInfo);
+        navigate("/Chat", { state: { isFirstRedirect: true, korisnikInfo: korisnikInfo, source: "GRAD" } });
     }
 
     const onOdulukeOdbora = (korisnikInfo: string) => {
@@ -431,6 +437,7 @@ export const Answer = ({
                         <Stack horizontal wrap tokens={{ childrenGap: 2 }} className={styles.downloadFileBtnContainer}>
                             <div className={styles.downloadFile} onClick={() => onInterniAkti && onInterniAkti(parsedAnswer.answerHtml)}> {t("Answer.InternalActs")}</div>
                             <div className={styles.downloadFile} onClick={() => onSudskeOdlukeClicked && onSudskeOdlukeClicked(parsedAnswer.answerHtml)}>{t("Answer.RelevantAuthorities")}</div>
+                            <div className={styles.downloadFile} onClick={() => onGraditeljstvoClicked && onGraditeljstvoClicked(parsedAnswer.answerHtml)}>{t("Answer.Construction")}</div>
                         </Stack>
                     </Stack.Item>
                 </div>

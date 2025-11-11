@@ -77,6 +77,7 @@
 
     "Chat.HeaderTextIA": "Interni Akti – Digitalni Savjetnik",
     "Chat.HeaderTextLA": "Pitajte informacije o odlukama VSRH",
+    "Chat.HeaderTextGRAD": "Graditeljstvo – Digitalni Savjetnik",
     "Chat.AI":"Legal AI koristi umjetnu inteligenciju.",
     "Chat.AskQuestion":"Postavite pitanje ili probajte primjere",
     "Chat.Close":"Zatvori",
@@ -112,6 +113,7 @@
     "Answer.LegalDisclaimer":"AI-generirani sadržaj može biti netočan",
     "Answer.InternalActs":"Interni akti",
     "Answer.RelevantAuthorities":"Odluke nadležnih tijela",
+    "Answer.Construction":"Graditeljstvo",
     "Answer.GenerateDecisionProposal":"Generiraj prijedlog odluke",
     "Answer.DownloadDecision" : "Preuzmite prijedlog odluke",
     "Answer.FollowUpQuestions" : "Naknadna pitanja:",
